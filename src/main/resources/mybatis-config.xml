@@ -62,7 +62,7 @@
                         |JNDI(JndiDataSourceFactory)
             自定义数据源：实现DataSourceFactory接口，type是全类名
  -->
-	<environments default="dev_oracle">
+	<environments default="d1">
 		<environment id="dev_mysql">
 			<transactionManager type="JDBC"></transactionManager>
 			<dataSource type="POOLED">
@@ -73,15 +73,27 @@
 			</dataSource>
 		</environment>
 
-		<environment id="dev_oracle">
+		<!-- 此处配置多个oracle数据源 -->
+		<environment id="d1">
 			<transactionManager type="JDBC" />
 			<dataSource type="POOLED">
-				<property name="driver" value="${orcl.driver}" />
-				<property name="url" value="${orcl.url}" />
-				<property name="username" value="${orcl.username}" />
-				<property name="password" value="${orcl.password}" />
+				<property name="driver" value="${d1.orcl.driver}" />
+				<property name="url" value="${d1.orcl.url}" />
+				<property name="username" value="${d1.orcl.username}" />
+				<property name="password" value="${d1.orcl.password}" />
 			</dataSource>
 		</environment>
+
+		<environment id="d2">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${d2.orcl.driver}" />
+				<property name="url" value="${d2.orcl.url}" />
+				<property name="username" value="${d2.orcl.username}" />
+				<property name="password" value="${d2.orcl.password}" />
+			</dataSource>
+		</environment>
+
 	</environments>
 
     <!-- 5、databaseIdProvider：支持多数据库厂商的；

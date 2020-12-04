@@ -4,7 +4,7 @@ import com.chadi.dbcompare.bean.Dba_tables;
 
 import java.util.List;
 
-public interface Dba_tablesMapper {
+public interface Dba_tablesMapper extends Mapper {
 
 
     //返回List
