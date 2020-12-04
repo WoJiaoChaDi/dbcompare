@@ -1,7 +1,9 @@
 package com.chadi.dbcompare.test;
 
 import com.chadi.dbcompare.bean.Dba_tables;
+import com.chadi.dbcompare.bean.User_triggers;
 import com.chadi.dbcompare.dao.Dba_tablesMapper;
+import com.chadi.dbcompare.dao.User_triggersMapper;
 import com.chadi.dbcompare.utils.CompareUtils;
 import com.chadi.dbcompare.utils.PropertyUtils;
 import com.chadi.factory.DataSourceEnum;
@@ -40,9 +42,9 @@ public class DbCompareTest {
 	public void test_Dba_tab_clos_MapperFactory() throws IOException {
 
 		//表
-		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
-		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
-		List<Dba_tables> resultList = mapper.getDba_tablesByPros(map);
+		//Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
+		//List<Dba_tables> resultList = mapper.getDba_tablesByPros(map);
 
 		//表列
 		//Dba_tab_colsMapper mapper = MapperFactory.createMapper(Dba_tab_colsMapper.class, DataSourceEnum.d1);
@@ -63,6 +65,16 @@ public class DbCompareTest {
 		//User_ConstraintsMapper mapper = MapperFactory.createMapper(User_ConstraintsMapper.class, DataSourceEnum.d1);
 		//Map map = CompareUtils.getPropertyToMap("User_Constraints.constantCol");
 		//List<User_Constraints> resultList = mapper.getUser_ConstraintsByPros(map);
+
+		//存储过程与函数
+		//User_proceduresMapper mapper = MapperFactory.createMapper(User_proceduresMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("User_procedures.constantCol");
+		//List<User_procedures> resultList = mapper.getUser_proceduresByPros(map);
+
+		//触发器
+		User_triggersMapper mapper = MapperFactory.createMapper(User_triggersMapper.class, DataSourceEnum.d1);
+		Map map = CompareUtils.getPropertyToMap("User_triggers.constantCol");
+		List<User_triggers> resultList = mapper.getUser_triggersByPros(map);
 
 		logger.info(""+resultList.size());
 
