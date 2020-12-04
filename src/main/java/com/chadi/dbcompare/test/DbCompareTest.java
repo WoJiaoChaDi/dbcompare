@@ -1,6 +1,8 @@
 package com.chadi.dbcompare.test;
 
+import com.chadi.dbcompare.bean.Dba_tab_cols;
 import com.chadi.dbcompare.bean.Dba_tables;
+import com.chadi.dbcompare.dao.Dba_tab_colsMapper;
 import com.chadi.dbcompare.dao.Dba_tablesMapper;
 import com.chadi.dbcompare.utils.CompareUtils;
 import com.chadi.dbcompare.utils.PropertyUtils;
@@ -14,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +40,31 @@ public class DbCompareTest {
 
 
 
+	//查询Dba_tab_cols
 	@Test
-	public void test_MapperFactory() throws IOException {
+	public void test_Dba_tab_clos_MapperFactory() throws IOException {
+
+		Dba_tab_colsMapper mapper = MapperFactory.createMapper(Dba_tab_colsMapper.class, DataSourceEnum.d1);
+
+		//通过OWNER查询
+		//List<Dba_tables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
+
+		//通过配置查询
+		Map map = CompareUtils.getPropertyToMap("Dba_tab_cols.constantCol");
+		List<Dba_tab_cols> dba_tablesList = mapper.getDba_tab_colsByOwner(map);
+
+		logger.info(""+dba_tablesList.size());
+
+		for (int i = 0; i < 5; i++) {
+			Dba_tab_cols result = dba_tablesList.get(i);
+			System.out.println(result.toString());
+		}
+	}
+
+
+    //Dba_tables
+	@Test
+	public void test_Dba_tables_MapperFactory() throws IOException {
 
 		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
 
@@ -48,15 +72,14 @@ public class DbCompareTest {
 		//List<Dba_tables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
 
 		//通过配置查询
-		List<Map> list = new ArrayList<>();
 		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
 		List<Dba_tables> dba_tablesList = mapper.getDba_tablesByPros(map);
 
 		logger.info(""+dba_tablesList.size());
 
 		//for (int i = 0; i < 10; i++) {
-		//	Dba_tables dba_tables = dba_tablesList.get(i);
-		//	System.out.println(dba_tables.toString());
+		//	Dba_tables result = dba_tablesList.get(i);
+		//	System.out.println(result.toString());
 		//}
 	}
 

@@ -2,17 +2,17 @@
 <!DOCTYPE mapper
  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.chadi.dbcompare.dao.Dba_tablesMapper">
+<mapper namespace="com.chadi.dbcompare.dao.Dba_tab_colsMapper">
 
 
     <!--返回List-->
-    <select id="getDba_tablesByOwner" resultType="com.chadi.dbcompare.bean.Dba_tables">
-		SELECT t1.* FROM dba_tables t1 WHERE t1.OWNER = #{owner}
+    <select id="dba_tab_cols" resultType="com.chadi.dbcompare.bean.Dba_tab_cols">
+		SELECT t1.* FROM dba_tab_cols t1 WHERE t1.OWNER = #{owner}
     </select>
 
     <!--返回List-->
-    <select id="getDba_tablesByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.Dba_tables">
-		SELECT t1.* FROM dba_tables t1
+    <select id="getDba_tab_colsByOwner"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.Dba_tab_cols">
+		SELECT t1.* FROM dba_tab_cols t1
         where 1=1
 
         <foreach collection="params.keys" item="key" open="and" close="" separator="and" >
