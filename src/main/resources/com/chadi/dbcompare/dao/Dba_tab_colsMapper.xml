@@ -11,7 +11,7 @@
     </select>
 
     <!--返回List-->
-    <select id="getDba_tab_colsByOwner"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.Dba_tab_cols">
+    <select id="getDba_tab_colsByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.Dba_tab_cols">
 		SELECT t1.* FROM dba_tab_cols t1
         where 1=1
 

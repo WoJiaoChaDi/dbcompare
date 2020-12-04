@@ -1,8 +1,6 @@
 package com.chadi.dbcompare.test;
 
-import com.chadi.dbcompare.bean.Dba_tab_cols;
 import com.chadi.dbcompare.bean.Dba_tables;
-import com.chadi.dbcompare.dao.Dba_tab_colsMapper;
 import com.chadi.dbcompare.dao.Dba_tablesMapper;
 import com.chadi.dbcompare.utils.CompareUtils;
 import com.chadi.dbcompare.utils.PropertyUtils;
@@ -27,9 +25,6 @@ public class DbCompareTest {
 
 	@Test
 	public void test() throws IOException {
-
-
-
 		Map map = new HashMap<>();
 
         String constantCol = PropertyUtils.getProperty("Dba_tables.constantCol");
@@ -44,21 +39,37 @@ public class DbCompareTest {
 	@Test
 	public void test_Dba_tab_clos_MapperFactory() throws IOException {
 
-		Dba_tab_colsMapper mapper = MapperFactory.createMapper(Dba_tab_colsMapper.class, DataSourceEnum.d1);
+		//表
+		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
+		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
+		List<Dba_tables> resultList = mapper.getDba_tablesByPros(map);
 
-		//通过OWNER查询
-		//List<Dba_tables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
+		//表列
+		//Dba_tab_colsMapper mapper = MapperFactory.createMapper(Dba_tab_colsMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("Dba_tab_cols.constantCol");
+		//List<Dba_tab_cols> resultList = mapper.getDba_tab_colsByPros(map);
 
-		//通过配置查询
-		Map map = CompareUtils.getPropertyToMap("Dba_tab_cols.constantCol");
-		List<Dba_tab_cols> dba_tablesList = mapper.getDba_tab_colsByOwner(map);
+		//索引
+		//Dba_ind_columnsMapper mapper = MapperFactory.createMapper(Dba_ind_columnsMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("Dba_ind_columns.constantCol");
+		//List<Dba_ind_columns> resultList = mapper.getDba_ind_columnsByPros(map);
 
-		logger.info(""+dba_tablesList.size());
+		//索引
+		//User_indexesMapper mapper = MapperFactory.createMapper(User_indexesMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("User_indexes.constantCol");
+		//List<User_indexes> resultList = mapper.getUser_indexesByPros(map);
 
-		for (int i = 0; i < 5; i++) {
-			Dba_tab_cols result = dba_tablesList.get(i);
-			System.out.println(result.toString());
-		}
+		//约束
+		//User_ConstraintsMapper mapper = MapperFactory.createMapper(User_ConstraintsMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("User_Constraints.constantCol");
+		//List<User_Constraints> resultList = mapper.getUser_ConstraintsByPros(map);
+
+		logger.info(""+resultList.size());
+
+		//for (int i = 0; i < 5; i++) {
+		//	Dba_tab_cols result = dba_tablesList.get(i);
+		//	System.out.println(result.toString());
+		//}
 	}
 
 
