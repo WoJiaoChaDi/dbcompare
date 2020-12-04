@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,48 @@ public class DbCompareTest {
 	}
 
 
+
+	//查询Dba_tab_cols
+	@Test
+	public void test_compare() throws IOException, IllegalAccessException {
+
+		//表
+		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
+		Dba_tablesMapper mapperxd = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d2);
+
+		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol_HEAD");
+		Map map_xd = CompareUtils.getPropertyToMap("Dba_tables.constantCol_XD_TEST_COMPARE");
+
+		List<Dba_tables> baseList = mapper.getDba_tablesByPros(map);
+		List<Dba_tables> targetList = mapperxd.getDba_tablesByPros(map_xd);
+
+		for (Dba_tables baseObj : baseList) {
+
+			String matchCol = "TABLE_NAME";
+			String baseVal = "";
+
+			// 获取对象属性
+			Field[] baseFields = baseObj.getClass().getDeclaredFields();
+			for(Field field: fields){
+				if(matchCol.equals(field.getName())){
+					field.setAccessible(true); // 私有属性必须设置访问权限
+					baseVal = (String) field.get(baseObj);
+				}
+			}
+
+			for (Dba_tables targetObj : targetList) {
+				// 获取对象属性
+				Field[] fields = targetObj.getClass().getDeclaredFields();
+				for(Field field: fields){
+					if(matchCol.equals(field.getName())){
+						field.setAccessible(true); // 私有属性必须设置访问权限
+						baseVal = (String) field.get(baseObj);
+					}
+				}
+
+			}
+		}
+	}
 
 	//查询Dba_tab_cols
 	@Test
