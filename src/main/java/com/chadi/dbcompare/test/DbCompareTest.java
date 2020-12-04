@@ -1,8 +1,9 @@
 package com.chadi.dbcompare.test;
 
-import com.alibaba.druid.util.StringUtils;
 import com.chadi.dbcompare.bean.Dba_tables;
 import com.chadi.dbcompare.dao.Dba_tablesMapper;
+import com.chadi.dbcompare.utils.CompareUtils;
+import com.chadi.dbcompare.utils.PropertyUtils;
 import com.chadi.factory.DataSourceEnum;
 import com.chadi.factory.DataSourceSqlSessionFactory;
 import com.chadi.factory.MapperFactory;
@@ -20,12 +21,20 @@ import java.util.Map;
 
 public class DbCompareTest {
 
-
+    final Logger logger = LoggerFactory.getLogger(DbCompareTest.class);
 
 
 	@Test
 	public void test() throws IOException {
+
+
+
 		Map map = new HashMap<>();
+
+        String constantCol = PropertyUtils.getProperty("Dba_tables.constantCol");
+        Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
+        logger.info(compareMap.toString());
+
 	}
 
 
@@ -33,16 +42,14 @@ public class DbCompareTest {
 	@Test
 	public void test_MapperFactory() throws IOException {
 
-		final Logger logger = LoggerFactory.getLogger(DbCompareTest.class);
-
 		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
 
+		//通过OWNER查询
 		//List<Dba_tables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
 
+		//通过配置查询
 		List<Map> list = new ArrayList<>();
-		Map map = new HashMap();
-		map.put("OWNER", "HEAD");
-		list.add(map);
+		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
 		List<Dba_tables> dba_tablesList = mapper.getDba_tablesByPros(map);
 
 		logger.info(""+dba_tablesList.size());
