@@ -6,10 +6,19 @@
 
 
     <!--返回List-->
-    <!-- public List<Employee> getEmpsByLastNameLike(String lastName); -->
-    <!--resultType：如果返回的是一个集合，要写集合中元素的类型  -->
     <select id="getDba_tablesByOwner" resultType="com.chadi.dbcompare.bean.Dba_tables">
-		SELECT t1.* FROM dba_tables t1 WHERE t1.OWNER = #{lastName}
+		SELECT t1.* FROM dba_tables t1 WHERE t1.OWNER = #{owner}
+    </select>
+
+    <!--返回List-->
+    <select id="getDba_tablesByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.Dba_tables">
+		SELECT t1.* FROM dba_tables t1
+        where 1=1
+
+        <foreach collection="params.keys" item="key" open="and" close="" separator="," >
+            t1.${key} = #{params[${key}]}
+        </foreach>
+
     </select>
 
 </mapper>

@@ -28,6 +28,9 @@
 		<!--显示的指定每个我们需要更改的配置的值，即使他是默认的。防止版本更新带来的问题  -->
 		<setting name="lazyLoadingEnabled" value="true"/>
 		<setting name="aggressiveLazyLoading" value="false"/>
+
+		<!-- 打印SQL   COMMONS_LOGGING只打印sql    STDOUT_LOGGING打印sql+数据 -->
+		<setting name="logImpl" value="COMMONS_LOGGING" />
     </settings>
 
 

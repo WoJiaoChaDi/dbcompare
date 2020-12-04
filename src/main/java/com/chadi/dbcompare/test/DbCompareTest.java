@@ -13,10 +13,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DbCompareTest {
-	
+
+
+
+
+	@Test
+	public void test() throws IOException {
+		Map map = new HashMap<>();
+	}
+
+
+
 	@Test
 	public void test_MapperFactory() throws IOException {
 
@@ -24,7 +37,13 @@ public class DbCompareTest {
 
 		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
 
-		List<Dba_tables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
+		//List<Dba_tables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
+
+		List<Map> list = new ArrayList<>();
+		Map map = new HashMap();
+		map.put("OWNER", "HEAD");
+		list.add(map);
+		List<Dba_tables> dba_tablesList = mapper.getDba_tablesByPros(map);
 
 		logger.info(""+dba_tablesList.size());
 
