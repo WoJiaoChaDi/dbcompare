@@ -27,6 +27,13 @@ public class MapperFactory {
         return (T)MapperProxy.bind(mapper, sqlSession);
     }
 
+    public static <T> T createMapper2(Class<? extends Mapper> clazz, DataSourceEnum environment) {
+        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory(environment);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        Mapper mapper = sqlSession.getMapper(clazz);
+        return (T)MapperProxy.bind(mapper, sqlSession);
+    }
+
     /**
      * Mapper Proxy
      * executing mapper method and close sqlsession

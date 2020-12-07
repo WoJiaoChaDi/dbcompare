@@ -5,7 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -104,57 +104,91 @@ public class CompareUtils {
         return newStr;
     }
 
-    public static List<? extends DbBaseObj> compareList(List<? extends DbBaseObj> baseList, List<? extends DbBaseObj> targetList, List<String> compareCols) throws IllegalAccessException {
-        //循环基础数据库
+    public static Map<String, List> compareList(List<? extends DbBaseObj> baseList, List<? extends DbBaseObj> targetList, List<String> compareCols) throws IllegalAccessException {
+
+        Map<String, List> resultMap = new HashMap<>();
+
+        List<Map> baseMapList = new ArrayList<>();
+        List<Map> targetMapList = new ArrayList<>();
+
+        //期望匹配的列数
+        int wishNum = compareCols.size();
+        //匹配成功的列数
+        int matchNum = 0;
+
+        //循环基础数据库 的每一条数据
         for (DbBaseObj baseObj : baseList) {
+            //基础数据库字段值
+            Map baseObjMap = BeanMapUtils.beanToMap(baseObj);
 
-            //循环"比较字段"
-            for (String compareCol : compareCols) {
-                //将"比较字段"转为驼峰
-                String matchCol = CompareUtils.strTrimLowlineAndRenameHump(compareCol);
-                //"比较字段"的值
-                String baseVal = "";
-                String targetVal = "";
+            for (DbBaseObj targetObj : targetList) {
+                //目标数据库字段值
+                Map targetObjMap = BeanMapUtils.beanToMap(targetObj);
 
-                // 获取对象属性
-                Field[] baseFields = baseObj.getClass().getDeclaredFields();
-                //循环获取 "比较字段"的值
-                for(Field baseFile: baseFields){
-                    if(matchCol.equals(baseFile.getName())){
-                        baseFile.setAccessible(true); // 私有属性必须设置访问权限
-                        baseVal = (String) baseFile.get(baseObj);
-                        //logger.info("-----baseVal" + baseVal);
-                        break;
+                //循环所有需要匹配的列
+                for (String compareCol : compareCols) {
+                    String baseCol = (String) baseObjMap.get(compareCol);
+                    String targetCol = (String) targetObjMap.get(compareCol);
+                    //匹配成功，记录数
+                    if (strCompare(baseCol, targetCol)) {
+                        baseObjMap.put(compareCol + "_CbFlag", true);
+                        targetObjMap.put(compareCol + "_CbFlag", true);
+                        matchNum++;
+                    }else{
+                        baseObjMap.put(compareCol + "_CbFlag", false);
+                        targetObjMap.put(compareCol + "_CbFlag", false);
                     }
                 }
 
-                for (DbBaseObj targetObj : targetList) {
 
-                    //如果是之前匹配成功的，则跳过
-                    if (targetObj.isMatchFlag()) {
-                        continue;
-                    }
 
-                    // 获取对象属性
-                    Field[] targetFields = targetObj.getClass().getDeclaredFields();
-                    //循环获取 "比较字段"的值
-                    for(Field targetField: targetFields){
-                        if(matchCol.equals(targetField.getName())){
-                            targetField.setAccessible(true); // 私有属性必须设置访问权限
-                            targetVal = (String) targetField.get(baseObj);
-                            //logger.info("-----targetVal" + targetVal);
-
-                            //记录匹配成功
-                            if(baseVal.equals(targetVal)){
-                                targetObj.setMatchFlag(true);
-                                break;
-                            }
-                        }
-                    }
+                //如果匹配成功的列数 与 期望列数 一致，说明字段完全一致
+                if (wishNum == matchNum) {
+                    baseObj.setMatchFlag(true);
+                    targetObj.setMatchFlag(true);
+                    baseObjMap.put("AllCbFlag", true);
+                    targetObjMap.put("AllCbFlag", true);
                 }
+
+                //添加目标map
+                targetMapList.add(targetObjMap);
             }
+
+            //添加基础map
+            baseMapList.add(baseObjMap);
         }
 
-        return targetList;
+        resultMap.put("baseList", baseList);
+        resultMap.put("targetList", targetList);
+        resultMap.put("baseMapList", baseMapList);
+        resultMap.put("targetMapList", targetMapList);
+        return resultMap;
+    }
+
+
+
+
+
+
+
+
+
+    public static boolean strCompare(String str1, String str2) {
+
+        if (str1 == null && str2 == null) {
+            return true;
+        }
+        if (str1 == null && str2 != null) {
+            return false;
+        }
+        if (str1 != null && str2 == null) {
+            return false;
+        }
+        if (str1 != null && str2 != null) {
+            if (str1.equals(str2)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
