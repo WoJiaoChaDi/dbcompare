@@ -2,11 +2,11 @@
 <!DOCTYPE mapper
  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.chadi.dbcompare.dao.User_indexesMapper">
+<mapper namespace="com.chadi.dbcompare.dao.DbaIndColumnsMapper">
 
     <!--返回List-->
-    <select id="getUser_indexesByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.User_indexes">
-		SELECT t1.* FROM User_indexes t1
+    <select id="getDba_ind_columnsByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaIndColumns">
+		SELECT t1.* FROM Dba_ind_columns t1
         where 1=1
 
         <foreach collection="params.keys" item="key" open="and" close="" separator="and" >

@@ -31,6 +31,9 @@
 
 		<!-- 打印SQL   COMMONS_LOGGING只打印sql    STDOUT_LOGGING打印sql+数据 -->
 		<setting name="logImpl" value="COMMONS_LOGGING" />
+
+		<!--下划线转驼峰属性-->
+		<!--<setting name="mapUnderscoreToCamelCase" value="true"/>-->
     </settings>
 
 
