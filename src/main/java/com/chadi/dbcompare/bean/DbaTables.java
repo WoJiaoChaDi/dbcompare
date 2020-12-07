@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DbaTables {
+public class DbaTables extends DbBaseObj{
 
     private String owner;
     private String tableName;

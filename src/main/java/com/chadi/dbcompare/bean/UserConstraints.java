@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserConstraints {
+public class UserConstraints extends DbBaseObj {
 
     private String owner;
     private String constraintName;

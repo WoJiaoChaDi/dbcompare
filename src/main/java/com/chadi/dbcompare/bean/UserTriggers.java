@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserTriggers {
+public class UserTriggers extends DbBaseObj {
     private String triggerName;
     private String triggerType;
     private String triggeringEvent;

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProcedures {
+public class UserProcedures extends DbBaseObj {
     private String objectName;
     private String procedureName;
     private String objectId;

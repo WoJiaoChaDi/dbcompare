@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserIndexes {
+public class UserIndexes extends DbBaseObj {
 
     private String indexName;
     private String indexType;

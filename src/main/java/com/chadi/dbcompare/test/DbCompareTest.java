@@ -1,9 +1,9 @@
 package com.chadi.dbcompare.test;
 
-import com.chadi.dbcompare.bean.Dba_tables;
-import com.chadi.dbcompare.bean.User_triggers;
-import com.chadi.dbcompare.dao.Dba_tablesMapper;
-import com.chadi.dbcompare.dao.User_triggersMapper;
+import com.chadi.dbcompare.bean.DbaTables;
+import com.chadi.dbcompare.bean.UserTriggers;
+import com.chadi.dbcompare.dao.DbaTablesMapper;
+import com.chadi.dbcompare.dao.UserTriggersMapper;
 import com.chadi.dbcompare.utils.CompareUtils;
 import com.chadi.dbcompare.utils.PropertyUtils;
 import com.chadi.factory.DataSourceEnum;
@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,52 +29,44 @@ public class DbCompareTest {
 	public void test() throws IOException {
 		Map map = new HashMap<>();
 
-        String constantCol = PropertyUtils.getProperty("Dba_tables.constantCol");
-        Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
+        String constantCol = PropertyUtils.getProperty("Dba_tables.constantCol_HEAD");
+        Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol_XD_TEST_COMPARE");
         logger.info(compareMap.toString());
+
+		String a = CompareUtils.strTrimLowlineAndRenameHump("TABLE_NAME_");
+		logger.info(a);
 
 	}
 
 
 
-	//查询Dba_tab_cols
+	/**
+	 * @description: 比较器测试
+	 * @param
+	 * @return: void
+	 * @author: XuDong
+	 * @time: 2020/12/7 15:01
+	 */
 	@Test
 	public void test_compare() throws IOException, IllegalAccessException {
 
-		//表
-		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
-		Dba_tablesMapper mapperxd = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d2);
+		//库
+		DbaTablesMapper db1 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
+		DbaTablesMapper db2 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d2);
 
-		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol_HEAD");
-		Map map_xd = CompareUtils.getPropertyToMap("Dba_tables.constantCol_XD_TEST_COMPARE");
+		Map baseMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol_HEAD");
+		Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol_XD_TEST_COMPARE");
+		List<String> compareCols = CompareUtils.getPropertyToList("Dba_tables.compareCol");
 
-		List<Dba_tables> baseList = mapper.getDba_tablesByPros(map);
-		List<Dba_tables> targetList = mapperxd.getDba_tablesByPros(map_xd);
+		List<DbaTables> baseList = db1.getDba_tablesByPros(baseMap);
+		List<DbaTables> targetList = db2.getDba_tablesByPros(compareMap);
 
-		for (Dba_tables baseObj : baseList) {
+		targetList = (List<DbaTables>) CompareUtils.compareList(baseList, targetList, compareCols);
 
-			String matchCol = "TABLE_NAME";
-			String baseVal = "";
-
-			// 获取对象属性
-			Field[] baseFields = baseObj.getClass().getDeclaredFields();
-			for(Field field: fields){
-				if(matchCol.equals(field.getName())){
-					field.setAccessible(true); // 私有属性必须设置访问权限
-					baseVal = (String) field.get(baseObj);
-				}
-			}
-
-			for (Dba_tables targetObj : targetList) {
-				// 获取对象属性
-				Field[] fields = targetObj.getClass().getDeclaredFields();
-				for(Field field: fields){
-					if(matchCol.equals(field.getName())){
-						field.setAccessible(true); // 私有属性必须设置访问权限
-						baseVal = (String) field.get(baseObj);
-					}
-				}
-
+		//匹配成功的数据
+		for (DbaTables targetDbaTables : targetList) {
+			if (targetDbaTables.isMatchFlag()) {
+				logger.info(targetDbaTables.getTableName());
 			}
 		}
 	}
@@ -85,66 +76,66 @@ public class DbCompareTest {
 	public void test_Dba_tab_clos_MapperFactory() throws IOException {
 
 		//表
-		//Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
-		//Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
-		//List<Dba_tables> resultList = mapper.getDba_tablesByPros(map);
+		//DbaTablesMapper mapper = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("DbaTables.constantCol");
+		//List<DbaTables> resultList = mapper.getDba_tablesByPros(map);
 
 		//表列
-		//Dba_tab_colsMapper mapper = MapperFactory.createMapper(Dba_tab_colsMapper.class, DataSourceEnum.d1);
-		//Map map = CompareUtils.getPropertyToMap("Dba_tab_cols.constantCol");
-		//List<Dba_tab_cols> resultList = mapper.getDba_tab_colsByPros(map);
+		//DbaTabColsMapper mapper = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("DbaTabCols.constantCol");
+		//List<DbaTabCols> resultList = mapper.getDba_tab_colsByPros(map);
 
 		//索引
-		//Dba_ind_columnsMapper mapper = MapperFactory.createMapper(Dba_ind_columnsMapper.class, DataSourceEnum.d1);
-		//Map map = CompareUtils.getPropertyToMap("Dba_ind_columns.constantCol");
-		//List<Dba_ind_columns> resultList = mapper.getDba_ind_columnsByPros(map);
+		//DbaIndColumnsMapper mapper = MapperFactory.createMapper(DbaIndColumnsMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("DbaIndColumns.constantCol");
+		//List<DbaIndColumns> resultList = mapper.getDba_ind_columnsByPros(map);
 
 		//索引
-		//User_indexesMapper mapper = MapperFactory.createMapper(User_indexesMapper.class, DataSourceEnum.d1);
-		//Map map = CompareUtils.getPropertyToMap("User_indexes.constantCol");
-		//List<User_indexes> resultList = mapper.getUser_indexesByPros(map);
+		//UserIndexesMapper mapper = MapperFactory.createMapper(UserIndexesMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("UserIndexes.constantCol");
+		//List<UserIndexes> resultList = mapper.getUser_indexesByPros(map);
 
 		//约束
-		//User_ConstraintsMapper mapper = MapperFactory.createMapper(User_ConstraintsMapper.class, DataSourceEnum.d1);
-		//Map map = CompareUtils.getPropertyToMap("User_Constraints.constantCol");
-		//List<User_Constraints> resultList = mapper.getUser_ConstraintsByPros(map);
+		//UserConstraintsMapper mapper = MapperFactory.createMapper(UserConstraintsMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("UserConstraints.constantCol");
+		//List<UserConstraints> resultList = mapper.getUser_ConstraintsByPros(map);
 
 		//存储过程与函数
-		//User_proceduresMapper mapper = MapperFactory.createMapper(User_proceduresMapper.class, DataSourceEnum.d1);
-		//Map map = CompareUtils.getPropertyToMap("User_procedures.constantCol");
-		//List<User_procedures> resultList = mapper.getUser_proceduresByPros(map);
+		//UserProceduresMapper mapper = MapperFactory.createMapper(UserProceduresMapper.class, DataSourceEnum.d1);
+		//Map map = CompareUtils.getPropertyToMap("UserProcedures.constantCol");
+		//List<UserProcedures> resultList = mapper.getUser_proceduresByPros(map);
 
 		//触发器
-		User_triggersMapper mapper = MapperFactory.createMapper(User_triggersMapper.class, DataSourceEnum.d1);
+		UserTriggersMapper mapper = MapperFactory.createMapper(UserTriggersMapper.class, DataSourceEnum.d1);
 		Map map = CompareUtils.getPropertyToMap("User_triggers.constantCol");
-		List<User_triggers> resultList = mapper.getUser_triggersByPros(map);
+		List<UserTriggers> resultList = mapper.getUser_triggersByPros(map);
 
 		logger.info(""+resultList.size());
 
 		//for (int i = 0; i < 5; i++) {
-		//	Dba_tab_cols result = dba_tablesList.get(i);
+		//	DbaTabCols result = dba_tablesList.get(i);
 		//	System.out.println(result.toString());
 		//}
 	}
 
 
-    //Dba_tables
+    //DbaTables
 	@Test
 	public void test_Dba_tables_MapperFactory() throws IOException {
 
-		Dba_tablesMapper mapper = MapperFactory.createMapper(Dba_tablesMapper.class, DataSourceEnum.d1);
+		DbaTablesMapper mapper = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
 
 		//通过OWNER查询
-		//List<Dba_tables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
+		//List<DbaTables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
 
 		//通过配置查询
-		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol");
-		List<Dba_tables> dba_tablesList = mapper.getDba_tablesByPros(map);
+		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol_HEAD");
+		List<DbaTables> dba_tablesList = mapper.getDba_tablesByPros(map);
 
 		logger.info(""+dba_tablesList.size());
 
 		//for (int i = 0; i < 10; i++) {
-		//	Dba_tables result = dba_tablesList.get(i);
+		//	DbaTables result = dba_tablesList.get(i);
 		//	System.out.println(result.toString());
 		//}
 	}
@@ -159,12 +150,12 @@ public class DbCompareTest {
 		try {
 			// 3、获取接口的实现类对象
 			//会为接口自动的创建一个代理对象，代理对象去执行增删改查方法
-			Dba_tablesMapper mapper = openSession.getMapper(Dba_tablesMapper.class);
-			List<Dba_tables> dba_tablesList= mapper.getDba_tablesByOwner("HEAD");
+			DbaTablesMapper mapper = openSession.getMapper(DbaTablesMapper.class);
+			List<DbaTables> dba_tablesList= mapper.getDba_tablesByOwner("HEAD");
 			System.out.println(mapper.getClass());
 
 			for (int i = 0; i < 10; i++) {
-				Dba_tables dba_tables = dba_tablesList.get(i);
+				DbaTables dba_tables = dba_tablesList.get(i);
 				System.out.println(dba_tables.toString());
 			}
 

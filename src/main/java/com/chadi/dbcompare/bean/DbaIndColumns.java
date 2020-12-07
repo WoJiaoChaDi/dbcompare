@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DbaIndColumns {
+public class DbaIndColumns extends DbBaseObj{
     private String indexOwner;
     private String indexName;
     private String tableOwner;
