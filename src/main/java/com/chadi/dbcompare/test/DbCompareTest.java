@@ -29,8 +29,8 @@ public class DbCompareTest {
 	public void test() throws IOException {
 		Map map = new HashMap<>();
 
-        String constantCol = PropertyUtils.getProperty("Dba_tables.constantCol_HEAD");
-        Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol_XD_TEST_COMPARE");
+        String constantCol = PropertyUtils.getProperty("Dba_tables.ConsCols_1");
+        Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_2");
         logger.info(compareMap.toString());
 
 		String a = CompareUtils.strTrimLowlineAndRenameHump("TABLE_NAME_");
@@ -54,9 +54,10 @@ public class DbCompareTest {
 		DbaTablesMapper db1 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
 		DbaTablesMapper db2 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d2);
 
-		Map baseMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol_HEAD");
-		Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.constantCol_XD_TEST_COMPARE");
-		List<String> compareCols = CompareUtils.getPropertyToList("Dba_tables.compareCol");
+		//库表
+		Map baseMap = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_1");
+		Map compareMap = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_2");
+		List<String> compareCols = CompareUtils.getPropertyToList("Dba_tables.ConsCols");
 
 		List<DbaTables> baseList = db1.getDba_tablesByPros(baseMap);
 		List<DbaTables> targetList = db2.getDba_tablesByPros(compareMap);
@@ -129,7 +130,7 @@ public class DbCompareTest {
 		//List<DbaTables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
 
 		//通过配置查询
-		Map map = CompareUtils.getPropertyToMap("Dba_tables.constantCol_HEAD");
+		Map map = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_1");
 		List<DbaTables> dba_tablesList = mapper.getDba_tablesByPros(map);
 
 		logger.info(""+dba_tablesList.size());
