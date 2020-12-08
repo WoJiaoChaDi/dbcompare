@@ -49,7 +49,7 @@ public class BeanMapUtils {
      * @param objList
      * @return
      */
-    public static <T> List<Map<String, Object>> objectsToMaps(List<T> objList) {
+    public static <T> List<Map<String, Object>> beansToMaps(List<T> objList) {
         List<Map<String, Object>> list = new ArrayList();
         if (objList != null && objList.size() > 0) {
             Map<String, Object> map = null;
@@ -71,7 +71,7 @@ public class BeanMapUtils {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public static <T> List<T> mapsToObjects(List<Map<String, Object>> maps,Class<T> clazz) throws InstantiationException, IllegalAccessException {
+    public static <T> List<T> mapsToBeans(List<Map<String, Object>> maps,Class<T> clazz) throws InstantiationException, IllegalAccessException {
         List<T> list = new ArrayList();
         if (maps != null && maps.size() > 0) {
             Map<String, Object> map = null;

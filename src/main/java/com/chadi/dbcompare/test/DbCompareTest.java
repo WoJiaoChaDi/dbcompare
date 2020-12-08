@@ -79,52 +79,66 @@ public class DbCompareTest {
         Map<String, List> resultMap = CompareUtils.compareList(dbaTables_BaseList, dbaTables_TargetList, dbaTables_CompareCols);
 
         //输出匹配结果
-		for (DbaTables dbaTables : dbaTables_TargetList) {
-			logger.info("对比表名：");
-		}
+        //List<DbaTables> baseList = resultMap.get("baseList");
+        //for (DbaTables baseTable : baseList) {
+        //    //未匹配成功的表
+        //    if(CompareUtils.matchFlag_Yes_2.equals(baseTable.getMatchFlag())){
+			//    logger.info("结果 - 匹配不成功的表名：" + baseTable.getTableName());
+        //    }else{
+        //        sameDbaTableName.add(baseTable.getTableName());
+        //    }
+        //}
 
-
-        //匹配成功的数据
-        for (DbaTables targetDbaTables : dbaTables_TargetList) {
-            //表名缺失
-            if (!targetDbaTables.isMatchFlag()) {
-                logger.info(targetDbaTables.getTableName());
-            }else{
-                //表名都有的
-				sameDbaTableName.add(targetDbaTables.getTableName());
-            }
+        List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
+        for (Map baseMapNoMatch : baseMapNoMatchList) {
+            logger.info("结果 - 匹配不成功的表名：" + baseMapNoMatch.get("tableName").toString());
         }
 
-        logger.info(sameDbaTableName.toString());
-        //sameDbaTableName = Arrays.asList("AXTAAEXM", "ZGXMONPM", "BATADBET", "BDPEXCHM");
-
-        //库表字段
-        DbaTabColsMapper dbaCols_Db1 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d1);
-        DbaTabColsMapper dbaCols_Db2 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d2);
-
-        Map dbaCols_BaseMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
-        Map dbaCols_CompareMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
-
-        //每次循环一个表名
-        for (String sameTableName : sameDbaTableName) {
-            dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
-            dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
-
-            List<String> dbaCols_CompareCols = CompareUtils.getPropertyToList("Dba_tab_cols.ConsCols");
-
-            List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap);
-            List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap);
-
-            //比较方法
-            dbaCols_TargetList = (List<DbaTabCols>) CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
-
-            //匹配成功的数据
-            for (DbaTabCols targetDbaTabCols : dbaCols_TargetList) {
-                if (!targetDbaTabCols.isMatchFlag()) {
-                    logger.info(targetDbaTabCols.getTableName());
-                }
-            }
+        List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
+        for (Map baseMapMatch : baseMapMatchList) {
+            logger.info("结果 - 匹配成功的表名：" + baseMapMatch.get("tableName").toString());
         }
+
+        List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
+        for (Map targetMapNoMatch : targetMapNoMatchList) {
+            logger.info("结果 - 匹配列表多出来的表名：" + targetMapNoMatch.get("tableName").toString());
+        }
+
+
+
+        //logger.info("结果 - 匹配成功的表名：" + sameDbaTableName.toString());
+        ////sameDbaTableName = Arrays.asList("AXTAAEXM", "ZGXMONPM", "BATADBET", "BDPEXCHM");
+        //
+        ////库表字段
+        //DbaTabColsMapper dbaCols_Db1 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d1);
+        //DbaTabColsMapper dbaCols_Db2 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d2);
+        //
+        //Map dbaCols_BaseMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
+        //Map dbaCols_CompareMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
+        //
+        ////每次循环一个表名
+        //for (String sameTableName : sameDbaTableName) {
+        //    dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
+        //    dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
+        //
+        //    List<String> dbaCols_CompareCols = CompareUtils.getPropertyToList("Dba_tab_cols.ConsCols");
+        //
+        //    List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap);
+        //    List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap);
+        //
+        //    //比较方法
+        //    Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
+        //
+        //    //输出匹配结果
+        //    List<DbaTabCols> baseColList = resultColMap.get("baseList");
+        //
+        //    logger.info("_____");
+        //    for (DbaTabCols dbaTabCols : baseColList) {
+        //        if(CompareUtils.matchFlag_Yes_2.equals(dbaTabCols.getMatchFlag())){
+        //            logger.info("结果 - 匹配不成功的列名：" + dbaTabCols.getTableName() + "-" + dbaTabCols.getColumnName());
+        //        }
+        //    }
+        //}
 
 	}
 

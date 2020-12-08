@@ -16,6 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DbBaseObj {
 
-    boolean matchFlag;
+    String matchFlag;
 
 }
