@@ -36,19 +36,24 @@ public class DbCompareTest {
 		logger.info(a);
 
 
-		//库表字段
-		DbaTabColsMapper dbaCols_Db1 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d1);
-		DbaTabColsMapper dbaCols_Db2 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d2);
+		//这种方式，每次使用完Mapper会关掉SqlSessionFactory连接
+        //DbaTablesMapper dbaCols_Db1 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
+		//Map dbaCols_BaseMap = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_1");
+		//List<DbaTables> dbaCols_BaseList = dbaCols_Db1.getDba_tablesByPros(dbaCols_BaseMap);
+        //logger.info("=============");
+        //List<DbaTables> dbaCols_BaseList2 = dbaCols_Db1.getDba_tablesByOwner("HEAD");
 
-		Map dbaCols_BaseMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
-		Map dbaCols_CompareMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
-		List<String> dbaCols_CompareCols = CompareUtils.getPropertyToList("Dba_tab_cols.ConsCols");
 
-		List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap);
-		List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap);
-		System.out.println(1);
+        //这种方式保持了SqlSessionFactory连接
+        SqlSessionFactory sqlSessionFactory = DataSourceSqlSessionFactory.getSqlSessionFactory(DataSourceEnum.d1);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        DbaTablesMapper dbaCols_Db1 = sqlSession.getMapper(DbaTablesMapper.class);
+        Map dbaCols_BaseMap = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_1");
+        List<DbaTables> dbaCols_BaseList = dbaCols_Db1.getDba_tablesByPros(dbaCols_BaseMap);
+        logger.info("=============");
+        List<DbaTables> dbaCols_BaseList2 = dbaCols_Db1.getDba_tablesByOwner("HEAD");
 
-	}
+    }
 
 
 
@@ -63,8 +68,12 @@ public class DbCompareTest {
 	public void test_TableAndCols() throws IOException, IllegalAccessException {
 
         //库表
-        DbaTablesMapper dbaTables_db1 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
-        DbaTablesMapper dbaTables_db2 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d2);
+        //DbaTablesMapper dbaTables_db1 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
+        //DbaTablesMapper dbaTables_db2 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d2);
+
+        DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
+        DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
+
         Map dbaTables_BaseMap = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_1");
         Map dbaTables_CompareMap = CompareUtils.getPropertyToMap("Dba_tables.ConsCols_2");
         List<String> dbaTables_CompareCols = CompareUtils.getPropertyToList("Dba_tables.ConsCols");
@@ -80,8 +89,8 @@ public class DbCompareTest {
         List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
         List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
         //库表字段
-        DbaTabColsMapper dbaCols_Db1 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d1);
-        DbaTabColsMapper dbaCols_Db2 = MapperFactory.createMapper(DbaTabColsMapper.class, DataSourceEnum.d2);
+        DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
+        DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
 
         Map dbaCols_BaseMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
         Map dbaCols_CompareMap = CompareUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");

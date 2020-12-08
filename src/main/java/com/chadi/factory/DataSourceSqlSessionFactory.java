@@ -1,7 +1,9 @@
 package com.chadi.factory;
 
+import com.chadi.dbcompare.dao.Mapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.slf4j.Logger;
@@ -48,5 +50,11 @@ public final class DataSourceSqlSessionFactory {
             SQLSESSIONFACTORYS.put(environment, sqlSessionFactory);
             return sqlSessionFactory;
         }
+    }
+
+    public static <T> T getTypeMapper(DataSourceEnum environment, Class<? extends Mapper> clazz){
+        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory(environment);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        return (T) sqlSession.getMapper(clazz);
     }
 }
