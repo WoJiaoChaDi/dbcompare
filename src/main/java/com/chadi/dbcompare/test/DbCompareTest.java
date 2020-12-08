@@ -60,7 +60,7 @@ public class DbCompareTest {
 	 * @time: 2020/12/7 15:01
 	 */
 	@Test
-	public void test_compare() throws IOException, IllegalAccessException {
+	public void test_TableAndCols() throws IOException, IllegalAccessException {
 
         //库表
         DbaTablesMapper dbaTables_db1 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d1);
