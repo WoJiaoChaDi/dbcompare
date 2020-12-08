@@ -97,6 +97,7 @@ public class DbCompareTest {
 
         //每次循环一个表名 匹配列
         for (Map baseMapMatch : baseMapMatchList) {
+
             String sameTableName = (String) baseMapMatch.get("tableName");
             dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
             dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
@@ -110,6 +111,7 @@ public class DbCompareTest {
             Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
 
             //输出结果
+            logger.info("=============当前处理的表名是：" + baseMapMatch.get("tableName") + "=============");
             soutResult(resultColMap, "columnName");
         }
 
@@ -117,25 +119,25 @@ public class DbCompareTest {
 
     private void soutResult(Map<String, List> resultMap, String type) {
 
-        logger.info("======↓======未能匹配成功的"+type+"名============");
+        logger.info("------↓------未能匹配成功的"+type+"名------↓------");
         List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
         for (Map baseMapNoMatch : baseMapNoMatchList) {
             logger.info(baseMapNoMatch.get(type).toString());
         }
 
-        logger.info("======↓======完全匹配成功的"+type+"名============");
+        logger.info("------↓------完全匹配成功的"+type+"名------↓------");
         List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
         for (Map baseMapAllMatch : baseMapAllMatchList) {
             logger.info(baseMapAllMatch.get(type).toString());
         }
 
-        logger.info("======↓======未能完全匹配的"+type+"名============");
+        logger.info("------↓------未能完全匹配的"+type+"名------↓------");
         List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
         for (Map baseMapPartMatch : baseMapPartMatchList) {
             logger.info(baseMapPartMatch.get(type).toString());
         }
 
-        logger.info("======↓======匹配队列多出的"+type+"名======↓======");
+        logger.info("------↓------匹配队列多出的"+type+"名------↓------");
         List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
         for (Map targetMapNoMatch : targetMapNoMatchList) {
             logger.info(targetMapNoMatch.get(type).toString());
