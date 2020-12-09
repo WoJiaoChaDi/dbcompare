@@ -1,12 +1,17 @@
 package com.chadi.dbcompare.utils;
 
 import net.sf.ehcache.util.PropertyUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class PropertyUtils {
@@ -55,5 +60,54 @@ public class PropertyUtils {
             loadProps();
         }
         return props.getProperty(key, defaultValue);
+    }
+
+    /**
+     * @description: 获取含有=的配置文件属性
+     * @param key
+     * @return: java.util.Map
+     * @author: XuDong
+     * @time: 2020/12/7 14:09
+     */
+    public static Map getPropertyToMap(String key){
+
+        Map map = new HashMap();
+        String property = PropertyUtils.getProperty(key);
+
+        if (StringUtils.isEmpty(property)) {
+            logger.error("未获取到" + key + "属性");
+        }
+
+        String[] split = property.split(",");
+
+        for (String s : split) {
+
+            String[] split1 = s.split("=");
+            if(split1.length == 2){
+                map.put(split1[0], split1[1]);
+            }
+        }
+        return map;
+    }
+
+    /**
+     * @description: 获取,分隔的配置文件属性
+     * @param key
+     * @return: java.util.Map
+     * @author: XuDong
+     * @time: 2020/12/7 14:09
+     */
+    public static List getPropertyToList(String key){
+
+        Map map = new HashMap();
+        String property = PropertyUtils.getProperty(key);
+
+        if (StringUtils.isEmpty(property)) {
+            logger.error("未获取到" + key + "属性");
+        }
+
+        String[] split = property.split(",");
+
+        return Arrays.asList(split);
     }
 }
