@@ -11,6 +11,6 @@ public interface DbaIndColumnsMapper extends Mapper {
     //通过compare.properties的固定列查询数据
     public List<DbaIndColumns> getDba_ind_columnsByPros(@Param("constantColMap") Map constantColMap,
                                                         @Param("notLikeMap") Map notLikeMap,
-                                                        @Param("joinPlusList") List joinPlusList);
+                                                        @Param("appendPlusList") List appendPlusList);
 
 }

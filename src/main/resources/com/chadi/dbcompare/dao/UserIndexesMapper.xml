@@ -21,8 +21,8 @@
             </foreach>
         </if>
 
-        <if test="joinPlusList != null">
-            <foreach collection="joinPlusList" item="joinPlus" open="and" close="" separator="and">
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
                 t1.${joinPlus}
             </foreach>
         </if>

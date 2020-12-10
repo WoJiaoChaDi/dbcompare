@@ -77,11 +77,11 @@ public class DbCompareTest {
         Map uConstr_BaseMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_1");
         Map uConstr_CompareMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_2");
         Map uConstr_NotLike = PropertyUtils.getPropertyToMap("User_Constraints.NotLikeMap");
-        List<String> uConstr_JoinPlusList = PropertyUtils.getPropertyToList("User_Constraints.JoinPlus");
+        List<String> uConstr_AppendPlusList = PropertyUtils.getPropertyToList("User_Constraints.AppendPlus");
         List<String> uConstr_CompareCols = PropertyUtils.getPropertyToList("User_Constraints.ConsCols");
 
-        List<UserConstraints> uConstr_BaseList = uConstr_db1.getUser_ConstraintsByPros(uConstr_BaseMap, uConstr_NotLike, uConstr_JoinPlusList);
-        List<UserConstraints> uConstr_TargetList = uConstr_db2.getUser_ConstraintsByPros(uConstr_CompareMap, uConstr_NotLike, uConstr_JoinPlusList);
+        List<UserConstraints> uConstr_BaseList = uConstr_db1.getUser_ConstraintsByPros(uConstr_BaseMap, uConstr_NotLike, uConstr_AppendPlusList);
+        List<UserConstraints> uConstr_TargetList = uConstr_db2.getUser_ConstraintsByPros(uConstr_CompareMap, uConstr_NotLike, uConstr_AppendPlusList);
 
         //比较方法
         Map<String, List> resultMap = CompareUtils.compareList(uConstr_BaseList, uConstr_TargetList, uConstr_CompareCols);
@@ -105,11 +105,11 @@ public class DbCompareTest {
         Map dbaIndex_BaseMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_1");
         Map dbaIndex_CompareMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_2");
         Map dbaIndex_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.NotLikeMap");
-        List<String> dbaIndex_JoinPlusList = PropertyUtils.getPropertyToList("Dba_ind_columns.JoinPlus");
+        List<String> dbaIndex_AppendPlusList = PropertyUtils.getPropertyToList("Dba_ind_columns.AppendPlus");
         List<String> dbaIndex_CompareCols = PropertyUtils.getPropertyToList("Dba_ind_columns.ConsCols");
 
-        List<DbaIndColumns> dbaIndex_BaseList = dbaIndex_db1.getDba_ind_columnsByPros(dbaIndex_BaseMap, dbaIndex_NotLikeMap, dbaIndex_JoinPlusList);
-        List<DbaIndColumns> dbaIndex_TargetList = dbaIndex_db2.getDba_ind_columnsByPros(dbaIndex_CompareMap, dbaIndex_NotLikeMap, dbaIndex_JoinPlusList);
+        List<DbaIndColumns> dbaIndex_BaseList = dbaIndex_db1.getDba_ind_columnsByPros(dbaIndex_BaseMap, dbaIndex_NotLikeMap, dbaIndex_AppendPlusList);
+        List<DbaIndColumns> dbaIndex_TargetList = dbaIndex_db2.getDba_ind_columnsByPros(dbaIndex_CompareMap, dbaIndex_NotLikeMap, dbaIndex_AppendPlusList);
 
         //比较方法
         Map<String, List> resultMap = CompareUtils.compareList(dbaIndex_BaseList, dbaIndex_TargetList, dbaIndex_CompareCols);
@@ -125,11 +125,11 @@ public class DbCompareTest {
         Map uIndex_BaseMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_1");
         Map uIndex_CompareMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_2");
         Map uIndex_NotLikeMap = PropertyUtils.getPropertyToMap("User_indexes.NotLikeMap");
-        List<String> uIndex_JoinPlusList = PropertyUtils.getPropertyToList("User_indexes.JoinPlus");
+        List<String> uIndex_AppendPlusList = PropertyUtils.getPropertyToList("User_indexes.AppendPlus");
 
         List<String> uIndex_CompareCols = PropertyUtils.getPropertyToList("User_indexes.ConsCols");
-        List<UserIndexes> uIndex_BaseList = uIndex_db1.getUser_indexesByPros(uIndex_BaseMap, uIndex_NotLikeMap, uIndex_JoinPlusList);
-        List<UserIndexes> uIndex_TargetList = uIndex_db2.getUser_indexesByPros(uIndex_CompareMap, uIndex_NotLikeMap, uIndex_JoinPlusList);
+        List<UserIndexes> uIndex_BaseList = uIndex_db1.getUser_indexesByPros(uIndex_BaseMap, uIndex_NotLikeMap, uIndex_AppendPlusList);
+        List<UserIndexes> uIndex_TargetList = uIndex_db2.getUser_indexesByPros(uIndex_CompareMap, uIndex_NotLikeMap, uIndex_AppendPlusList);
 
         //比较方法
         Map<String, List> uIndex_resultMap = CompareUtils.compareList(uIndex_BaseList, uIndex_TargetList, uIndex_CompareCols);
@@ -159,12 +159,12 @@ public class DbCompareTest {
         Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
         Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
         Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
-        List<String> dbaTables_JoinPlusList = PropertyUtils.getPropertyToList("Dba_tables.JoinPlus");
+        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
         List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.ConsCols");
 
 
-        List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_JoinPlusList);
-        List<DbaTables> dbaTables_TargetList = dbaTables_db2.getDba_tablesByPros(dbaTables_CompareMap, dbaTables_NotLikeMap, dbaTables_JoinPlusList);
+        List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
+        List<DbaTables> dbaTables_TargetList = dbaTables_db2.getDba_tablesByPros(dbaTables_CompareMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
 
         //比较方法
         Map<String, List> resultMap = CompareUtils.compareList(dbaTables_BaseList, dbaTables_TargetList, dbaTables_CompareCols);
@@ -181,7 +181,7 @@ public class DbCompareTest {
         Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
         Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
         Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
-        List<String> dbaCols_JoinPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.JoinPlus");
+        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
 
         //每次循环一个表名 匹配列
         for (Map baseMapMatch : baseMapMatchList) {
@@ -192,8 +192,8 @@ public class DbCompareTest {
 
             List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
 
-            List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_JoinPlusList);
-            List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_JoinPlusList);
+            List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
+            List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
 
             //比较方法
             Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
