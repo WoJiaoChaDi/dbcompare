@@ -1,10 +1,16 @@
 package com.chadi.dbcompare.test;
 
+import com.chadi.dbcompare.bean.DbaIndColumns;
 import com.chadi.dbcompare.bean.DbaTabCols;
 import com.chadi.dbcompare.bean.DbaTables;
+import com.chadi.dbcompare.bean.UserConstraints;
+import com.chadi.dbcompare.bean.UserIndexes;
 import com.chadi.dbcompare.bean.UserTriggers;
+import com.chadi.dbcompare.dao.DbaIndColumnsMapper;
 import com.chadi.dbcompare.dao.DbaTabColsMapper;
 import com.chadi.dbcompare.dao.DbaTablesMapper;
+import com.chadi.dbcompare.dao.UserConstraintsMapper;
+import com.chadi.dbcompare.dao.UserIndexesMapper;
 import com.chadi.dbcompare.dao.UserTriggersMapper;
 import com.chadi.dbcompare.utils.CommonUtils;
 import com.chadi.dbcompare.utils.CompareUtils;
@@ -50,16 +56,91 @@ public class DbCompareTest {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         DbaTablesMapper dbaCols_Db1 = sqlSession.getMapper(DbaTablesMapper.class);
         Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
-        List<DbaTables> dbaCols_BaseList = dbaCols_Db1.getDba_tablesByPros(dbaCols_BaseMap);
+        List<DbaTables> dbaCols_BaseList = dbaCols_Db1.getDba_tablesByPros(dbaCols_BaseMap, null, null);
         logger.info("=============");
         List<DbaTables> dbaCols_BaseList2 = dbaCols_Db1.getDba_tablesByOwner("HEAD");
 
     }
 
 
+    /**
+     * @description: 比较器测试 - 约束
+     * @param
+     * @return: void
+     * @author: XuDong
+     * @time: 2020/12/8 10:32
+     */
+    @Test
+    public void test_Constraints() throws IOException, IllegalAccessException {
+        UserConstraintsMapper uConstr_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserConstraintsMapper.class);
+        UserConstraintsMapper uConstr_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserConstraintsMapper.class);
+        Map uConstr_BaseMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_1");
+        Map uConstr_CompareMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_2");
+        Map uConstr_NotLike = PropertyUtils.getPropertyToMap("User_Constraints.NotLikeMap");
+        List<String> uConstr_JoinPlusList = PropertyUtils.getPropertyToList("User_Constraints.JoinPlus");
+        List<String> uConstr_CompareCols = PropertyUtils.getPropertyToList("User_Constraints.ConsCols");
+
+        List<UserConstraints> uConstr_BaseList = uConstr_db1.getUser_ConstraintsByPros(uConstr_BaseMap, uConstr_NotLike, uConstr_JoinPlusList);
+        List<UserConstraints> uConstr_TargetList = uConstr_db2.getUser_ConstraintsByPros(uConstr_CompareMap, uConstr_NotLike, uConstr_JoinPlusList);
+
+        //比较方法
+        Map<String, List> resultMap = CompareUtils.compareList(uConstr_BaseList, uConstr_TargetList, uConstr_CompareCols);
+
+        //输出结果
+        CompareUtils.soutResult(resultMap, "uConstr", uConstr_CompareCols);
+    }
+
+
+    /**
+     * @description: 比较器测试 - 索引
+     * @param
+     * @return: void
+     * @author: XuDong
+     * @time: 2020/12/8 10:32
+     */
+    @Test
+    public void test_Indexs() throws IOException, IllegalAccessException {
+        DbaIndColumnsMapper dbaIndex_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaIndColumnsMapper.class);
+        DbaIndColumnsMapper dbaIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaIndColumnsMapper.class);
+        Map dbaIndex_BaseMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_1");
+        Map dbaIndex_CompareMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_2");
+        Map dbaIndex_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.NotLikeMap");
+        List<String> dbaIndex_JoinPlusList = PropertyUtils.getPropertyToList("Dba_ind_columns.JoinPlus");
+        List<String> dbaIndex_CompareCols = PropertyUtils.getPropertyToList("Dba_ind_columns.ConsCols");
+
+        List<DbaIndColumns> dbaIndex_BaseList = dbaIndex_db1.getDba_ind_columnsByPros(dbaIndex_BaseMap, dbaIndex_NotLikeMap, dbaIndex_JoinPlusList);
+        List<DbaIndColumns> dbaIndex_TargetList = dbaIndex_db2.getDba_ind_columnsByPros(dbaIndex_CompareMap, dbaIndex_NotLikeMap, dbaIndex_JoinPlusList);
+
+        //比较方法
+        Map<String, List> resultMap = CompareUtils.compareList(dbaIndex_BaseList, dbaIndex_TargetList, dbaIndex_CompareCols);
+
+        //输出结果
+        CompareUtils.soutResult(resultMap, "dbaIndex", dbaIndex_CompareCols);
+
+
+        logger.info("===================");
+
+        UserIndexesMapper uIndex_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserIndexesMapper.class);
+        UserIndexesMapper uIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserIndexesMapper.class);
+        Map uIndex_BaseMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_1");
+        Map uIndex_CompareMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_2");
+        Map uIndex_NotLikeMap = PropertyUtils.getPropertyToMap("User_indexes.NotLikeMap");
+        List<String> uIndex_JoinPlusList = PropertyUtils.getPropertyToList("User_indexes.JoinPlus");
+
+        List<String> uIndex_CompareCols = PropertyUtils.getPropertyToList("User_indexes.ConsCols");
+        List<UserIndexes> uIndex_BaseList = uIndex_db1.getUser_indexesByPros(uIndex_BaseMap, uIndex_NotLikeMap, uIndex_JoinPlusList);
+        List<UserIndexes> uIndex_TargetList = uIndex_db2.getUser_indexesByPros(uIndex_CompareMap, uIndex_NotLikeMap, uIndex_JoinPlusList);
+
+        //比较方法
+        Map<String, List> uIndex_resultMap = CompareUtils.compareList(uIndex_BaseList, uIndex_TargetList, uIndex_CompareCols);
+
+        //输出结果
+        CompareUtils.soutResult(uIndex_resultMap, "uIndex", uIndex_CompareCols);
+    }
+
 
 	/**
-	 * @description: 比较器测试
+	 * @description: 比较器测试 - 表与列测试
 	 * @param
 	 * @return: void
 	 * @author: XuDong
@@ -77,9 +158,13 @@ public class DbCompareTest {
 
         Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
         Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
+        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
+        List<String> dbaTables_JoinPlusList = PropertyUtils.getPropertyToList("Dba_tables.JoinPlus");
         List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.ConsCols");
-        List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap);
-        List<DbaTables> dbaTables_TargetList = dbaTables_db2.getDba_tablesByPros(dbaTables_CompareMap);
+
+
+        List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_JoinPlusList);
+        List<DbaTables> dbaTables_TargetList = dbaTables_db2.getDba_tablesByPros(dbaTables_CompareMap, dbaTables_NotLikeMap, dbaTables_JoinPlusList);
 
         //比较方法
         Map<String, List> resultMap = CompareUtils.compareList(dbaTables_BaseList, dbaTables_TargetList, dbaTables_CompareCols);
@@ -95,6 +180,8 @@ public class DbCompareTest {
 
         Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
         Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
+        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
+        List<String> dbaCols_JoinPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.JoinPlus");
 
         //每次循环一个表名 匹配列
         for (Map baseMapMatch : baseMapMatchList) {
@@ -105,8 +192,8 @@ public class DbCompareTest {
 
             List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
 
-            List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap);
-            List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap);
+            List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_JoinPlusList);
+            List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_JoinPlusList);
 
             //比较方法
             Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
@@ -177,7 +264,7 @@ public class DbCompareTest {
 
 		//通过配置查询
 		Map map = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
-		List<DbaTables> dba_tablesList = mapper.getDba_tablesByPros(map);
+		List<DbaTables> dba_tablesList = mapper.getDba_tablesByPros(map, null, null);
 
 		logger.info(""+dba_tablesList.size());
 

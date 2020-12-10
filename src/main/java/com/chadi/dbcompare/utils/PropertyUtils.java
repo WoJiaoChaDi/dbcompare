@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +77,7 @@ public class PropertyUtils {
 
         if (StringUtils.isEmpty(property)) {
             logger.error("未获取到" + key + "属性");
+            return null;
         }
 
         String[] split = property.split(",");
@@ -88,6 +90,36 @@ public class PropertyUtils {
             }
         }
         return map;
+    }
+
+    /**
+     * @description: 获取含有=的配置文件属性
+     * @param key
+     * @return: java.util.Map
+     * @author: XuDong
+     * @time: 2020/12/7 14:09
+     */
+    public static List<Map> getPropertyToListMap(String key){
+
+        List<Map> list = new ArrayList<>();
+        String property = PropertyUtils.getProperty(key);
+
+        if (StringUtils.isEmpty(property)) {
+            logger.error("未获取到" + key + "属性");
+            return null;
+        }
+
+        String[] split = property.split(",");
+
+        for (String s : split) {
+            Map map = new HashMap();
+            String[] split1 = s.split("=");
+            if(split1.length == 2){
+                map.put(split1[0], split1[1]);
+            }
+            list.add(map);
+        }
+        return list;
     }
 
     /**
@@ -104,6 +136,7 @@ public class PropertyUtils {
 
         if (StringUtils.isEmpty(property)) {
             logger.error("未获取到" + key + "属性");
+            return null;
         }
 
         String[] split = property.split(",");

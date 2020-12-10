@@ -13,6 +13,8 @@ public interface DbaTabColsMapper extends Mapper {
     public List<DbaTabCols> getDba_tab_colsByOwner(String owner);
 
     //通过compare.properties的固定列查询数据
-    public List<DbaTabCols> getDba_tab_colsByPros(@Param("params") Map constantColMaps);
+    public List<DbaTabCols> getDba_tab_colsByPros(@Param("constantColMap") Map constantColMap,
+                                                  @Param("notLikeMap") Map notLikeMap,
+                                                  @Param("joinPlusList") List joinPlusList);
 
 }

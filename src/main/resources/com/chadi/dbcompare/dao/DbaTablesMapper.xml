@@ -17,9 +17,21 @@
         FROM dba_tables t1
         where 1=1
 
-        <foreach collection="params.keys" item="key" open="and" close="" separator="and" >
-            t1.${key} = #{params[${key}]}
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
         </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="joinPlusList != null">
+            <foreach collection="joinPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
 
     </select>
 

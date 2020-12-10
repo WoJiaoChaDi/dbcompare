@@ -9,6 +9,8 @@ import java.util.Map;
 public interface UserIndexesMapper extends Mapper {
 
     //通过compare.properties的固定列查询数据
-    public List<UserIndexes> getUser_indexesByPros(@Param("params") Map constantColMaps);
+    public List<UserIndexes> getUser_indexesByPros(@Param("constantColMap") Map constantColMap,
+                                                   @Param("notLikeMap") Map notLikeMap,
+                                                   @Param("joinPlusList") List joinPlusList);
 
 }

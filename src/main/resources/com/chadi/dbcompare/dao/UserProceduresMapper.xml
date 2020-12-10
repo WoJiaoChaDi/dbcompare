@@ -13,6 +13,12 @@
             t1.${key} = #{params[${key}]}
         </foreach>
 
+        <if test="notLike != null">
+            <foreach collection="notLike.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLike[${key}]}
+            </foreach>
+        </if>
+
     </select>
 
 </mapper>

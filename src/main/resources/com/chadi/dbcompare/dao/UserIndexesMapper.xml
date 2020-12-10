@@ -6,12 +6,26 @@
 
     <!--返回List-->
     <select id="getUser_indexesByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.UserIndexes">
-		SELECT t1.* FROM User_indexes t1
+		SELECT
+        t1.INDEX_NAME, t1.INDEX_TYPE, t1.TABLE_OWNER, t1.TABLE_NAME, t1.TABLE_TYPE, t1.UNIQUENESS, t1.COMPRESSION, t1.PREFIX_LENGTH, t1.TABLESPACE_NAME, t1.INI_TRANS, t1.MAX_TRANS, t1.INITIAL_EXTENT, t1.NEXT_EXTENT, t1.MIN_EXTENTS, t1.MAX_EXTENTS, t1.PCT_INCREASE, t1.PCT_THRESHOLD, t1.INCLUDE_COLUMN, t1.FREELISTS, t1.FREELIST_GROUPS, t1.PCT_FREE, t1.LOGGING, t1.BLEVEL, t1.LEAF_BLOCKS, t1.DISTINCT_KEYS, t1.AVG_LEAF_BLOCKS_PER_KEY, t1.AVG_DATA_BLOCKS_PER_KEY, t1.CLUSTERING_FACTOR, t1.STATUS, t1.NUM_ROWS, t1.SAMPLE_SIZE, t1.LAST_ANALYZED, t1.DEGREE, t1.INSTANCES, t1.PARTITIONED, t1.TEMPORARY, t1.GENERATED, t1.SECONDARY, t1.BUFFER_POOL, t1.FLASH_CACHE, t1.CELL_FLASH_CACHE, t1.USER_STATS, t1.DURATION, t1.PCT_DIRECT_ACCESS, t1.ITYP_OWNER, t1.ITYP_NAME, t1.PARAMETERS, t1.GLOBAL_STATS, t1.DOMIDX_STATUS, t1.DOMIDX_OPSTATUS, t1.FUNCIDX_STATUS, t1.JOIN_INDEX, t1.IOT_REDUNDANT_PKEY_ELIM, t1.DROPPED, t1.VISIBILITY, t1.DOMIDX_MANAGEMENT, t1.SEGMENT_CREATED
+        FROM User_indexes t1
         where 1=1
 
-        <foreach collection="params.keys" item="key" open="and" close="" separator="and" >
-            t1.${key} = #{params[${key}]}
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
         </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="joinPlusList != null">
+            <foreach collection="joinPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
 
     </select>
 
