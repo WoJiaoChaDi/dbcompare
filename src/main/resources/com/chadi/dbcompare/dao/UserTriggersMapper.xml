@@ -13,9 +13,15 @@
             t1.${key} = #{params[${key}]}
         </foreach>
 
-        <if test="notLike != null">
-            <foreach collection="notLike.keys" item="key" open="and" close="" separator="and" >
-                t1.${key} not like #{notLike[${key}]}
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
             </foreach>
         </if>
 

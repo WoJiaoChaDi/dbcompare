@@ -237,7 +237,7 @@ public class CompareUtils {
         List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
         soutCompareResult(type, compareCols, baseMapAllMatchList);
 
-        logger.info("------↓------未能完全匹配的"+type+"名------↓------");
+        logger.info("------↓------未能完全匹配的"+type+"名，未匹配字段用【】框起来的------↓------");
         List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
         soutCompareResult(type, compareCols, baseMapPartMatchList);
 
@@ -254,7 +254,7 @@ public class CompareUtils {
         //拼装每列的数据
         for (Map<String, String> baseMapNoMatch : baseMapNoMatchList) {
 
-            String info = "";
+            String info = "| ";
 
             for (String compareCol : compareCols) {
                 String col = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
@@ -262,19 +262,28 @@ public class CompareUtils {
 
                 //判断字段匹配失败
                 if(CompareUtils.matchFlag_Yes_2.equals(baseMapNoMatch.get(col + CompareUtils.keyMatchStatus))){
-                    info += "-";
+                    //匹配失败字段标记
+                    info += "【";
                 }
-                info += baseMapNoMatch.get(col) + "\t";
+                info += baseMapNoMatch.get(col);
+                if(CompareUtils.matchFlag_Yes_2.equals(baseMapNoMatch.get(col + CompareUtils.keyMatchStatus))){
+                    //匹配失败字段标记
+                    info += "】";
+                }
+                info += "\t";
             }
+
+            info += " |";
             logger.info(info);
         }
     }
 
     private static void soutCompareColsSplitByTab(List<String> compareCols) {
-        String cols = "";
+        String cols = "||";
         for (String compareCol : compareCols) {
             cols += compareCol + "\t";
         }
+        cols += "||";
         logger.info(cols + "\t");
     }
 

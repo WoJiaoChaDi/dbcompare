@@ -8,7 +8,8 @@ import java.util.Map;
 
 public interface UserProceduresMapper extends Mapper {
 
-    //通过compare.properties的固定列查询数据
-    public List<UserProcedures> getUser_proceduresByPros(@Param("params") Map constantColMaps);
+    public List<UserProcedures> getUser_proceduresByPros(@Param("constantColMap") Map constantColMap,
+                                                   @Param("notLikeMap") Map notLikeMap,
+                                                   @Param("appendPlusList") List appendPlusList);
 
 }

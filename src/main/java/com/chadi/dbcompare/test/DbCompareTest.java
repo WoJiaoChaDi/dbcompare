@@ -5,12 +5,14 @@ import com.chadi.dbcompare.bean.DbaTabCols;
 import com.chadi.dbcompare.bean.DbaTables;
 import com.chadi.dbcompare.bean.UserConstraints;
 import com.chadi.dbcompare.bean.UserIndexes;
+import com.chadi.dbcompare.bean.UserProcedures;
 import com.chadi.dbcompare.bean.UserTriggers;
 import com.chadi.dbcompare.dao.DbaIndColumnsMapper;
 import com.chadi.dbcompare.dao.DbaTabColsMapper;
 import com.chadi.dbcompare.dao.DbaTablesMapper;
 import com.chadi.dbcompare.dao.UserConstraintsMapper;
 import com.chadi.dbcompare.dao.UserIndexesMapper;
+import com.chadi.dbcompare.dao.UserProceduresMapper;
 import com.chadi.dbcompare.dao.UserTriggersMapper;
 import com.chadi.dbcompare.utils.CommonUtils;
 import com.chadi.dbcompare.utils.CompareUtils;
@@ -64,6 +66,36 @@ public class DbCompareTest {
 
 
     /**
+     * @description: 比较器测试 - 存储过程
+     * @param
+     * @return: void
+     * @author: XuDong
+     * @time: 2020/12/8 10:32
+     */
+    @Test
+    public void test_Procedure() throws IOException, IllegalAccessException {
+        UserProceduresMapper uPrecedure_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserProceduresMapper.class);
+        UserProceduresMapper uPrecedure_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, UserProceduresMapper.class);
+
+        Map uPrecedure_BaseMap = PropertyUtils.getPropertyToMap("User_Procedures.ConsCols_1");
+        Map uPrecedure_CompareMap = PropertyUtils.getPropertyToMap("User_Procedures.ConsCols_2");
+        Map uPrecedure_NotLike = PropertyUtils.getPropertyToMap("User_Procedures.NotLikeMap");
+        List<String> uPrecedure_AppendPlusList = PropertyUtils.getPropertyToList("User_Procedures.AppendPlus");
+        List<String> uPrecedure_CompareCols = PropertyUtils.getPropertyToList("User_Procedures.ConsCols");
+
+        List<UserProcedures> uPrecedure_BaseList = uPrecedure_db1.getUser_proceduresByPros(uPrecedure_BaseMap, uPrecedure_NotLike, uPrecedure_AppendPlusList);
+        List<UserProcedures> uPrecedure_TargetList = uPrecedure_db2.getUser_proceduresByPros(uPrecedure_CompareMap, uPrecedure_NotLike, uPrecedure_AppendPlusList);
+
+        //比较方法
+        Map<String, List> resultMap = CompareUtils.compareList(uPrecedure_BaseList, uPrecedure_TargetList, uPrecedure_CompareCols);
+
+        //输出结果
+        CompareUtils.soutResult(resultMap, "uPrecedure", uPrecedure_CompareCols);
+
+    }
+
+
+    /**
      * @description: 比较器测试 - 约束
      * @param
      * @return: void
@@ -73,7 +105,7 @@ public class DbCompareTest {
     @Test
     public void test_Constraints() throws IOException, IllegalAccessException {
         UserConstraintsMapper uConstr_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserConstraintsMapper.class);
-        UserConstraintsMapper uConstr_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserConstraintsMapper.class);
+        UserConstraintsMapper uConstr_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, UserConstraintsMapper.class);
         Map uConstr_BaseMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_1");
         Map uConstr_CompareMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_2");
         Map uConstr_NotLike = PropertyUtils.getPropertyToMap("User_Constraints.NotLikeMap");
@@ -101,7 +133,7 @@ public class DbCompareTest {
     @Test
     public void test_Indexs() throws IOException, IllegalAccessException {
         DbaIndColumnsMapper dbaIndex_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaIndColumnsMapper.class);
-        DbaIndColumnsMapper dbaIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaIndColumnsMapper.class);
+        DbaIndColumnsMapper dbaIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaIndColumnsMapper.class);
         Map dbaIndex_BaseMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_1");
         Map dbaIndex_CompareMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_2");
         Map dbaIndex_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.NotLikeMap");
@@ -121,7 +153,7 @@ public class DbCompareTest {
         logger.info("===================");
 
         UserIndexesMapper uIndex_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserIndexesMapper.class);
-        UserIndexesMapper uIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserIndexesMapper.class);
+        UserIndexesMapper uIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, UserIndexesMapper.class);
         Map uIndex_BaseMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_1");
         Map uIndex_CompareMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_2");
         Map uIndex_NotLikeMap = PropertyUtils.getPropertyToMap("User_indexes.NotLikeMap");
@@ -154,7 +186,7 @@ public class DbCompareTest {
         //DbaTablesMapper dbaTables_db2 = MapperFactory.createMapper(DbaTablesMapper.class, DataSourceEnum.d2);
 
         DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
-        DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
+        DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTablesMapper.class);
 
         Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
         Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
@@ -176,7 +208,7 @@ public class DbCompareTest {
         List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
         //库表字段
         DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
-        DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
+        DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
 
         Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
         Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");

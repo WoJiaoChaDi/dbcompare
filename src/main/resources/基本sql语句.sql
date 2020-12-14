@@ -11,3 +11,47 @@ CREATE TABLE tbl_employee (
 
 alter table tbl_employee
 add constraint PK_tbl_employee primary key (ID);
+
+
+
+
+-- 存储过程测试
+
+CREATE OR REPLACE PROCEDURE proce_01(i IN NUMBER) AS
+BEGIN
+       dbms_output.put_line('12334233');
+END proce_01;
+
+CREATE OR REPLACE PROCEDURE proce_02 IS
+  x NUMBER(4,2);
+  y NUMBER(2,4);
+BEGIN
+  x := 1;
+  y := 2;
+  --要处理的业务逻辑
+END;
+
+CREATE OR REPLACE PROCEDURE proce_03 IS
+BEGIN
+  dbms_output.put_line('123');
+    --要处理的业务逻辑
+--  EXCEPTION    --存储过程异常
+END;
+
+CREATE OR REPLACE PROCEDURE proce_04 IS
+BEGIN
+  dbms_output.put_line('123aaaaa');
+    --要处理的业务逻辑
+--  EXCEPTION    --存储过程异常
+END;
+
+CREATE OR REPLACE PROCEDURE proce_05 IS
+BEGIN
+  dbms_output.put_line('123aaaa55a');
+    --要处理的业务逻辑
+--  EXCEPTION    --存储过程异常
+END;
+
+
+
+
