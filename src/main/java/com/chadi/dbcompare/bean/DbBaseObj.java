@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DbBaseObj {
+public abstract class DbBaseObj {
 
     String matchFlag;
 
