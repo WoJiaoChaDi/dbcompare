@@ -53,5 +53,35 @@ BEGIN
 END;
 
 
+-- 触发器比较
+CREATE OR REPLACE TRIGGER trigger_01
+BEFORE INSERT ON AXTAAEXM
+FOR EACH ROW
+  DECLARE
+  next_id NUMBER;
+  BEGIN
+    dbms_output.put_line('1');
+  END;
+
+CREATE OR REPLACE TRIGGER trigger_02
+BEFORE INSERT ON AXTAAEXM
+FOR EACH ROW
+DECLARE
+next_id NUMBER;
+BEGIN
+  dbms_output.put_line('2');
+END;
+
+
+CREATE OR REPLACE TRIGGER trigger_03
+BEFORE INSERT ON AXTAAEXM
+FOR EACH ROW
+  DECLARE
+  next_id NUMBER;
+  BEGIN
+    dbms_output.put_line('3');
+  END;
+
+
 
 

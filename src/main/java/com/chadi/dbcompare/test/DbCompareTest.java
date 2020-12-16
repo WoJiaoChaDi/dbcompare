@@ -6,6 +6,7 @@ import com.chadi.dbcompare.bean.DbaTables;
 import com.chadi.dbcompare.bean.UserConstraints;
 import com.chadi.dbcompare.bean.UserIndexes;
 import com.chadi.dbcompare.bean.UserProcedures;
+import com.chadi.dbcompare.bean.UserSource;
 import com.chadi.dbcompare.bean.UserTriggers;
 import com.chadi.dbcompare.dao.DbaIndColumnsMapper;
 import com.chadi.dbcompare.dao.DbaTabColsMapper;
@@ -13,6 +14,7 @@ import com.chadi.dbcompare.dao.DbaTablesMapper;
 import com.chadi.dbcompare.dao.UserConstraintsMapper;
 import com.chadi.dbcompare.dao.UserIndexesMapper;
 import com.chadi.dbcompare.dao.UserProceduresMapper;
+import com.chadi.dbcompare.dao.UserSourceMapper;
 import com.chadi.dbcompare.dao.UserTriggersMapper;
 import com.chadi.dbcompare.utils.CommonUtils;
 import com.chadi.dbcompare.utils.CompareUtils;
@@ -66,7 +68,7 @@ public class DbCompareTest {
 
 
     /**
-     * @description: 比较器测试 - 存储过程
+     * @description: 比较器测试 - 存储过程/触发器
      * @param
      * @return: void
      * @author: XuDong
@@ -92,6 +94,34 @@ public class DbCompareTest {
         //输出结果
         CompareUtils.soutResult(resultMap, "uPrecedure", uPrecedure_CompareCols);
 
+
+        //存储过程细节对比
+        List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
+        //库表字段
+        UserSourceMapper uSource_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserSourceMapper.class);
+        UserSourceMapper uSource_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, UserSourceMapper.class);
+
+        //每次循环一个表名 匹配列
+        for (Map baseMapMatch : baseMapMatchList) {
+
+            List<String> uSource_CompareCols = PropertyUtils.getPropertyToList("User_Source.ConsCols");
+            String objectName = (String) baseMapMatch.get("objectName");
+            String objectType = (String) baseMapMatch.get("objectType");
+
+
+            List<UserSource> uSource_BaseList = uSource_Db1.getUser_sourceByNameAndType(objectName, objectType);
+            List<UserSource> uSource_TargetList = uSource_Db2.getUser_sourceByNameAndType(objectName, objectType);
+
+
+            logger.info("=========================================================");
+            //比较方法
+            Map<String, List> resultColMap = CompareUtils.compareListByLine(uSource_BaseList, uSource_TargetList, uSource_CompareCols);
+
+            //输出结果
+            logger.info("=============当前处理的" + "类型是：" + objectType + "    存储过程名是：" +objectName + "=============");
+            CompareUtils.soutResult(resultColMap, objectName, uSource_CompareCols);
+
+        }
     }
 
 
@@ -234,7 +264,6 @@ public class DbCompareTest {
             logger.info("=============当前处理的表名是：" + baseMapMatch.get("tableName") + "=============");
             CompareUtils.soutResult(resultColMap, "columnName", dbaCols_CompareCols);
         }
-
 	}
 
     //查询Dba_tab_cols

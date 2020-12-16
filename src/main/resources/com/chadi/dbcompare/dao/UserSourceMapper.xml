@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chadi.dbcompare.dao.UserSourceMapper">
+
+    <!--返回List-->
+    <select id="getUser_sourceByNameAndType" resultType="com.chadi.dbcompare.bean.UserSource">
+        SELECT t.NAME, t.TYPE, t.LINE, t.TEXT FROM user_source t
+        where 1=1
+        <if test="name != null">
+            and t.name = #{name}
+        </if>
+
+        <if test="type != null">
+            and t.type = #{type}
+        </if>
+
+        order by t.line asc
+
+    </select>
+
+</mapper>

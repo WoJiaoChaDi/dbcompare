@@ -28,6 +28,8 @@
             </foreach>
         </if>
 
+        order by t1.OBJECT_TYPE asc, t1.OBJECT_NAME asc
+
     </select>
 
 </mapper>
