@@ -5,6 +5,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -422,24 +425,30 @@ public class CompareUtils {
 
     public static void soutResult(Map<String, List> resultMap, String type, List<String> compareCols) {
 
-        logger.info("------↓------未能匹配成功的"+type+"名------↓------");
+        String s1 = "------↓------未能匹配成功的" + type + "名------↓------";
+        logger.info(s1);
         List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
-        soutCompareResult(type, compareCols, baseMapNoMatchList);
+        soutCompareResult(s1, compareCols, baseMapNoMatchList);
 
-        logger.info("------↓------完全匹配成功的"+type+"名------↓------");
+        String s2 = "------↓------完全匹配成功的" + type + "名------↓------";
+        logger.info(s2);
         List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
-        soutCompareResult(type, compareCols, baseMapAllMatchList);
+        soutCompareResult(s2, compareCols, baseMapAllMatchList);
 
-        logger.info("------↓------未能完全匹配的"+type+"名，未匹配字段用【】框起来的------↓------");
+        String s3 = "------↓------未能完全匹配的" + type + "名，未匹配字段用【】框起来的------↓------";
+        logger.info(s3);
         List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
-        soutCompareResult(type, compareCols, baseMapPartMatchList);
+        soutCompareResult(s3, compareCols, baseMapPartMatchList);
 
-        logger.info("------↓------匹配队列多出的"+type+"名------↓------");
+        String s4 = "------↓------匹配队列多出的" + type + "名------↓------";
+        logger.info(s4);
         List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
-        soutCompareResult(type, compareCols, targetMapNoMatchList);
+        soutCompareResult(s4, compareCols, targetMapNoMatchList);
     }
 
-    private static void soutCompareResult(String type, List<String> compareCols, List<Map> baseMapNoMatchList) {
+    private static void soutCompareResult(String info, List<String> compareCols, List<Map> baseMapNoMatchList) {
+
+        info += "\n";
         //输出表头
         if(!CollectionUtils.isEmpty(baseMapNoMatchList)){
             soutCompareColsSplitByTab(compareCols);
@@ -447,7 +456,7 @@ public class CompareUtils {
         //拼装每列的数据
         for (Map<String, String> baseMapNoMatch : baseMapNoMatchList) {
 
-            String info = "| ";
+            info += "| ";
 
             for (String compareCol : compareCols) {
                 String col = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
@@ -466,8 +475,9 @@ public class CompareUtils {
                 info += "\t";
             }
 
-            info += " |";
+            info += " |" + "\n";
             logger.info(info);
+            sysoutToText(info);
         }
     }
 
@@ -478,6 +488,20 @@ public class CompareUtils {
         }
         cols += "||";
         logger.info(cols + "\t");
+    }
+
+    public static void sysoutToText(String str){
+        try {
+            File f = new File("d:" + File.separator+"test.txt");
+            OutputStream out=new FileOutputStream(f,true);//追加内容
+            byte[] b=str.getBytes();
+            for(int i=0;i<b.length;i++){
+                out.write(b[i]);
+            }
+            out.close();
+        } catch (Exception e) {
+            logger.info("输出异常", e);
+        }
     }
 
 }
