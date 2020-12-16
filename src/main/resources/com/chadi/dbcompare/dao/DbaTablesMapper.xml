@@ -33,6 +33,7 @@
             </foreach>
         </if>
 
+        order by t1.TABLESPACE_NAME, t1.OWNER, t1.TABLE_NAME
     </select>
 
 </mapper>

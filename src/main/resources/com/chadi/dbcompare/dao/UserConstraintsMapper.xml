@@ -27,8 +27,6 @@
             <!--</foreach>-->
         <!--</if>-->
 
-
-
         <if test="notLikeMap != null">
             <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
                 t1.${key} not like #{notLikeMap[${key}]}
@@ -40,6 +38,8 @@
                 t1.${joinPlus}
             </foreach>
         </if>
+
+        order by t1.OWNER, t1.TABLE_NAME, t1.CONSTRAINT_NAME
 
     </select>
 

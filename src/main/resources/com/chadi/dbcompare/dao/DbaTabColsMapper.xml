@@ -39,6 +39,8 @@
             </foreach>
         </if>
 
+        order by  t1.OWNER, t1.TABLE_NAME, t1.COLUMN_NAME
+
     </select>
 
 </mapper>

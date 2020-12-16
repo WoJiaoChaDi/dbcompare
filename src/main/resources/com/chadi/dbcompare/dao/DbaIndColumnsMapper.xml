@@ -26,6 +26,8 @@
             </foreach>
         </if>
 
+        order by t1.INDEX_OWNER, t1.TABLE_OWNER, t1.TABLE_NAME, t1.INDEX_NAME
+
     </select>
 
 </mapper>

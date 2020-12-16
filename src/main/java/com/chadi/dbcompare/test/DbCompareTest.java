@@ -7,7 +7,6 @@ import com.chadi.dbcompare.bean.UserConstraints;
 import com.chadi.dbcompare.bean.UserIndexes;
 import com.chadi.dbcompare.bean.UserProcedures;
 import com.chadi.dbcompare.bean.UserSource;
-import com.chadi.dbcompare.bean.UserTriggers;
 import com.chadi.dbcompare.dao.DbaIndColumnsMapper;
 import com.chadi.dbcompare.dao.DbaTabColsMapper;
 import com.chadi.dbcompare.dao.DbaTablesMapper;
@@ -15,7 +14,6 @@ import com.chadi.dbcompare.dao.UserConstraintsMapper;
 import com.chadi.dbcompare.dao.UserIndexesMapper;
 import com.chadi.dbcompare.dao.UserProceduresMapper;
 import com.chadi.dbcompare.dao.UserSourceMapper;
-import com.chadi.dbcompare.dao.UserTriggersMapper;
 import com.chadi.dbcompare.utils.CommonUtils;
 import com.chadi.dbcompare.utils.CompareUtils;
 import com.chadi.dbcompare.utils.PropertyUtils;
@@ -301,11 +299,11 @@ public class DbCompareTest {
 		//List<UserProcedures> resultList = mapper.getUser_proceduresByPros(map);
 
 		//触发器
-		UserTriggersMapper mapper = MapperFactory.createMapper(UserTriggersMapper.class, DataSourceEnum.d1);
-		Map map = PropertyUtils.getPropertyToMap("User_triggers.constantCol");
-		List<UserTriggers> resultList = mapper.getUser_triggersByPros(map);
+		//UserTriggersMapper mapper = MapperFactory.createMapper(UserTriggersMapper.class, DataSourceEnum.d1);
+		//Map map = PropertyUtils.getPropertyToMap("User_triggers.constantCol");
+		//List<UserTriggers> resultList = mapper.getUser_triggersByPros(map);
 
-		logger.info(""+resultList.size());
+		//logger.info(""+resultList.size());
 
 		//for (int i = 0; i < 5; i++) {
 		//	DbaTabCols result = dba_tablesList.get(i);
