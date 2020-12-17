@@ -14,19 +14,21 @@ import com.chadi.dbcompare.dao.UserConstraintsMapper;
 import com.chadi.dbcompare.dao.UserIndexesMapper;
 import com.chadi.dbcompare.dao.UserProceduresMapper;
 import com.chadi.dbcompare.dao.UserSourceMapper;
-import com.chadi.dbcompare.utils.CommonUtils;
 import com.chadi.dbcompare.utils.CompareUtils;
+import com.chadi.dbcompare.utils.ExcelUtils;
 import com.chadi.dbcompare.utils.PropertyUtils;
 import com.chadi.factory.DataSourceEnum;
 import com.chadi.factory.DataSourceSqlSessionFactory;
 import com.chadi.factory.MapperFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +39,12 @@ public class DbCompareTest {
 
 	@Test
 	public void test() throws IOException {
-        String constantCol = PropertyUtils.getProperty("Dba_tables.ConsCols_1");
-        Map compareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
-        logger.info(compareMap.toString());
-
-		String a = CommonUtils.strTrimLowlineAndRenameHump("TABLE_NAME_");
-		logger.info(a);
+        //String constantCol = PropertyUtils.getProperty("Dba_tables.ConsCols_1");
+        //Map compareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
+        //logger.info(compareMap.toString());
+        //
+		//String a = CommonUtils.strTrimLowlineAndRenameHump("TABLE_NAME_");
+		//logger.info(a);
 
 
 		//这种方式，每次使用完Mapper会关掉SqlSessionFactory连接
@@ -54,14 +56,138 @@ public class DbCompareTest {
 
 
         //这种方式保持了SqlSessionFactory连接
-        SqlSessionFactory sqlSessionFactory = DataSourceSqlSessionFactory.getSqlSessionFactory(DataSourceEnum.d1);
-        SqlSession sqlSession = sqlSessionFactory.openSession();
-        DbaTablesMapper dbaCols_Db1 = sqlSession.getMapper(DbaTablesMapper.class);
-        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
-        List<DbaTables> dbaCols_BaseList = dbaCols_Db1.getDba_tablesByPros(dbaCols_BaseMap, null, null);
-        logger.info("=============");
-        List<DbaTables> dbaCols_BaseList2 = dbaCols_Db1.getDba_tablesByOwner("HEAD");
+        //SqlSessionFactory sqlSessionFactory = DataSourceSqlSessionFactory.getSqlSessionFactory(DataSourceEnum.d1);
+        //SqlSession sqlSession = sqlSessionFactory.openSession();
+        //DbaTablesMapper dbaCols_Db1 = sqlSession.getMapper(DbaTablesMapper.class);
+        //Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
+        //List<DbaTables> dbaCols_BaseList = dbaCols_Db1.getDba_tablesByPros(dbaCols_BaseMap, null, null);
+        //logger.info("=============");
+        //List<DbaTables> dbaCols_BaseList2 = dbaCols_Db1.getDba_tablesByOwner("HEAD");
 
+        String[] strs = {"sTile1", "sTile2"};
+        List<DbaTables> list = new ArrayList<>();
+        DbaTables dbaTables = new DbaTables();
+        dbaTables.setTableLock("tabllllock");
+        dbaTables.setTableName("tableNName");
+        DbaTables dbaTables2 = new DbaTables();
+        dbaTables2.setTableLock("tabllllock22");
+        dbaTables2.setTableName("tableNName22");
+        DbaTables dbaTables3 = new DbaTables();
+        dbaTables3.setTableLock("tabllllock33");
+        dbaTables3.setTableName("tableNName33");
+        list.add(dbaTables);
+        list.add(dbaTables2);
+        list.add(dbaTables3);
+
+        // excel的标题
+        String[] title = {"账户名称","支付金额","支付去向","交易时间"};
+        // 下载后文件的名称
+        String fileName = "DbTestExcel.xls";
+        //sheet名
+        String sheetName = "sheet1";
+        // 建一个二维数组，前面放行 （每行数据），后面放列 （每列标题）
+        String[][] content = new String[list.size()][title.length];
+        for (int i = 0; i < list.size(); i ++) {
+            DbaTables record = list.get(i);
+            content[i][0] = record.getTableName();
+            content[i][1] = "1" + i;
+            content[i][2] = "1" + i;
+            content[i][3] = "1" + i;
+        }
+
+
+        // 建HSSFWorkbook
+        HSSFWorkbook wb = ExcelUtils.getHSSFWorkbook(sheetName, title, content);
+        ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName+ ".xls");
+
+    }
+
+    @Test
+    public void test_exportExcel_DbaTables(){
+        DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
+        DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTablesMapper.class);
+
+        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
+        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
+        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
+        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.ConsCols");
+
+
+        List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
+        List<DbaTables> dbaTables_TargetList = dbaTables_db2.getDba_tablesByPros(dbaTables_CompareMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
+
+        //比较方法
+        Map<String, List> resultMap = CompareUtils.compareList(dbaTables_BaseList, dbaTables_TargetList, dbaTables_CompareCols);
+
+        // 下载后文件的名称
+        String fileName = "DbTestExcel.xls";
+
+        String bigTitle1 = "DB1有，DB2中无";
+        List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
+
+        String bigTitle2 = "DB1有，DB2也有";
+        List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
+
+        String bigTitle3 = "DB1有，DB2也有，但是匹配字段不完全一致";
+        List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
+
+        String bigTitle4 = "DB1无，DB2有";
+        List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
+
+
+        // excel的标题
+        List<String> title = dbaTables_CompareCols;
+        //sheet名
+        String sheetName = "DbaTables";
+        // 建一个二维数组，前面放行 （每行数据），后面放列 （每列标题）
+        List<Map> resultList = new ArrayList<>();
+        resultList.addAll(baseMapNoMatchList);
+
+        // 建HSSFWorkbook
+        // 第一步，创建一个HSSFWorkbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+        int rowCount = 0;
+        //HSSFWorkbook wb, String sheetName, String bigTitle, List<String> titles, List<Map> values, int rowCount
+        wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetName, bigTitle1, title, resultList, rowCount);
+
+        ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName+ ".xls");
+
+
+
+        //输出结果
+        CompareUtils.soutResult(resultMap, "tableName", dbaTables_CompareCols);
+
+        //List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
+        //List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
+        ////库表字段
+        //DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
+        //DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
+        //
+        //Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
+        //Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
+        //Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
+        //List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
+        //
+        ////每次循环一个表名 匹配列
+        //for (Map baseMapMatch : baseMapMatchList) {
+        //
+        //    String sameTableName = (String) baseMapMatch.get("tableName");
+        //    dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
+        //    dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
+        //
+        //    List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
+        //
+        //    List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
+        //    List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
+        //
+        //    //比较方法
+        //    Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
+        //
+        //    //输出结果
+        //    logger.info("=============当前处理的表名是：" + baseMapMatch.get("tableName") + "=============");
+        //    CompareUtils.soutResult(resultColMap, "columnName", dbaCols_CompareCols);
+        //}
     }
 
 
@@ -118,7 +244,6 @@ public class DbCompareTest {
             //输出结果
             logger.info("=============当前处理的" + "类型是：" + objectType + "    存储过程名是：" +objectName + "=============");
             CompareUtils.soutResult(resultColMap, objectName, uSource_CompareCols);
-
         }
     }
 

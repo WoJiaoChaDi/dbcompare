@@ -33,7 +33,7 @@ public class CompareUtils {
  * @author: XuDong
  * @time: 2020/12/16 16:37
  */
-    public static Map<String, List> compareList(List<? extends DbBaseObj> baseList, List<? extends DbBaseObj> targetList, List<String> compareCols) throws IllegalAccessException {
+    public static Map<String, List> compareList(List<? extends DbBaseObj> baseList, List<? extends DbBaseObj> targetList, List<String> compareCols) {
 
         Map<String, List> resultMap = new HashMap<>();
 
@@ -428,27 +428,27 @@ public class CompareUtils {
         String s1 = "------↓------未能匹配成功的" + type + "名------↓------";
         logger.info(s1);
         List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
-        soutCompareResult(s1, compareCols, baseMapNoMatchList);
+        soutCompareResult(compareCols, baseMapNoMatchList);
 
         String s2 = "------↓------完全匹配成功的" + type + "名------↓------";
         logger.info(s2);
         List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
-        soutCompareResult(s2, compareCols, baseMapAllMatchList);
+        soutCompareResult(compareCols, baseMapAllMatchList);
 
         String s3 = "------↓------未能完全匹配的" + type + "名，未匹配字段用【】框起来的------↓------";
         logger.info(s3);
         List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
-        soutCompareResult(s3, compareCols, baseMapPartMatchList);
+        soutCompareResult(compareCols, baseMapPartMatchList);
 
         String s4 = "------↓------匹配队列多出的" + type + "名------↓------";
         logger.info(s4);
         List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
-        soutCompareResult(s4, compareCols, targetMapNoMatchList);
+        soutCompareResult(compareCols, targetMapNoMatchList);
     }
 
-    private static void soutCompareResult(String info, List<String> compareCols, List<Map> baseMapNoMatchList) {
+    private static void soutCompareResult(List<String> compareCols, List<Map> baseMapNoMatchList) {
 
-        info += "\n";
+        String info = "";
         //输出表头
         if(!CollectionUtils.isEmpty(baseMapNoMatchList)){
             soutCompareColsSplitByTab(compareCols);
@@ -459,8 +459,7 @@ public class CompareUtils {
             info += "| ";
 
             for (String compareCol : compareCols) {
-                String col = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
-                col = col.replace("*", "");
+                String col = strToHumpAndNoStar(compareCol);
 
                 //判断字段匹配失败
                 if(CompareUtils.matchFlag_Yes_2.equals(baseMapNoMatch.get(col + CompareUtils.keyMatchStatus))){
@@ -479,6 +478,12 @@ public class CompareUtils {
             logger.info(info);
             sysoutToText(info);
         }
+    }
+
+    public static String strToHumpAndNoStar(String compareCol) {
+        String col = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
+        col = col.replace("*", "");
+        return col;
     }
 
     private static void soutCompareColsSplitByTab(List<String> compareCols) {
