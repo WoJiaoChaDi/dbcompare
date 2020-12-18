@@ -82,6 +82,12 @@ public class CompareUtils {
                 //循环所有需要匹配的列
                 for (int i = 0; i < compareCols.size(); i++) {
                     String compareCol = compareCols.get(i);
+
+                    //去掉下划线，变成驼峰命名
+                    if(compareCol != null && compareCol.startsWith("-")){
+                        continue;
+                    }
+                    //去掉下划线，变成驼峰命名
                     compareCol = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
 
                     boolean mainColFlag = false;
@@ -274,6 +280,10 @@ public class CompareUtils {
             for (int j = 0; j < compareCols.size(); j++) {
                 String compareCol = compareCols.get(j);
 
+                //去掉下划线，变成驼峰命名
+                if(compareCol != null && compareCol.startsWith("-")){
+                    continue;
+                }
                 //去掉下划线，变成驼峰命名
                 compareCol = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
 
@@ -498,9 +508,8 @@ public class CompareUtils {
         return col;
     }
 
-    public static String strToHumpAndNoMin(String compareCol) {
-        String col = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
-        col = col.replace("-", "");
+    public static String strTrimMin(String compareCol) {
+        String col = compareCol.replace("-", "");
         return col;
     }
 

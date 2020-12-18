@@ -191,6 +191,8 @@ public class ExcelUtils {
                 String title = titles.get(j);
 
                 HSSFCell valueCell = row.createCell(j);
+                //去掉-号
+                title = CompareUtils.strTrimMin(title);
                 //去掉*号
                 String key = CompareUtils.strToHumpAndNoStar(title);
                 String value = (String) valueMap.get(key);
