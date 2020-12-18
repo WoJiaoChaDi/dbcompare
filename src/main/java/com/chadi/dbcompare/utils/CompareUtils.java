@@ -75,6 +75,9 @@ public class CompareUtils {
                 //    break;
                 //}
 
+                //重置期望匹配的列数
+                wishNum = compareCols.size();
+
                 //目标数据库字段值
                 Map targetObjMap = BeanMapUtils.beanToMap(targetObj);
                 targetObjMap.put(CompareUtils.matchStatus, CompareUtils.matchFlag_No_0);
@@ -85,6 +88,7 @@ public class CompareUtils {
 
                     //去掉下划线，变成驼峰命名
                     if(compareCol != null && compareCol.startsWith("-")){
+                        wishNum--;
                         continue;
                     }
                     //去掉下划线，变成驼峰命名
@@ -272,6 +276,9 @@ public class CompareUtils {
                 targetObj = targetList.get(i);
             }
 
+            //重置期望匹配的列数
+            wishNum = compareCols.size();
+
             //目标数据库字段值
             Map targetObjMap = BeanMapUtils.beanToMap(targetObj);
             targetObjMap.put(CompareUtils.matchStatus, CompareUtils.matchFlag_No_0);
@@ -282,6 +289,7 @@ public class CompareUtils {
 
                 //去掉下划线，变成驼峰命名
                 if(compareCol != null && compareCol.startsWith("-")){
+                    wishNum--;
                     continue;
                 }
                 //去掉下划线，变成驼峰命名

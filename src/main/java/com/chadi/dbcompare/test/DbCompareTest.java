@@ -165,13 +165,12 @@ public class DbCompareTest {
         List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
 
         //每次循环一个表名 匹配列
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
         for (Map baseMapMatch : baseMapMatchList) {
 
             String sameTableName = (String) baseMapMatch.get("tableName");
             dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
             dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
-
-            List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
 
             List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
             List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
