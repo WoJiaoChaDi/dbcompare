@@ -125,19 +125,16 @@ public class DbCompareTest {
 
         String bigTitle1 = "DB1有，DB2中无";
         List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
-
         String bigTitle2 = "DB1有，DB2也有";
         List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
-
         String bigTitle3 = "DB1有，DB2也有，但是匹配字段不完全一致";
         List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
-
         String bigTitle4 = "DB1无，DB2有";
         List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
 
 
         // excel的标题
-        List<String> title = dbaTables_CompareCols;
+        List<String> titleTables = dbaTables_CompareCols;
         //sheet名
         String sheetName = "DbaTables";
         // 建一个二维数组，前面放行 （每行数据），后面放列 （每列标题）
@@ -149,45 +146,58 @@ public class DbCompareTest {
         HSSFWorkbook wb = new HSSFWorkbook();
         int rowCount = 0;
         //HSSFWorkbook wb, String sheetName, String bigTitle, List<String> titles, List<Map> values, int rowCount
-        wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetName, bigTitle1, title, resultList, rowCount);
+        wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetName, bigTitle1, titleTables, baseMapNoMatchList, rowCount);
+        wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetName, bigTitle2, titleTables, baseMapAllMatchList, null);
+        wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetName, bigTitle3, titleTables, baseMapPartMatchList, null);
+        wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetName, bigTitle4, titleTables, targetMapNoMatchList, null);
 
-        ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName+ ".xls");
+        //ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName+ ".xls");
 
+        //字段比较
+        List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
+        //库表字段
+        DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
+        DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
 
+        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
+        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
+        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
+        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
 
-        //输出结果
-        CompareUtils.soutResult(resultMap, "tableName", dbaTables_CompareCols);
+        //每次循环一个表名 匹配列
+        for (Map baseMapMatch : baseMapMatchList) {
 
-        //List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
-        //List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
-        ////库表字段
-        //DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
-        //DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
-        //
-        //Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
-        //Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
-        //Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
-        //List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
-        //
-        ////每次循环一个表名 匹配列
-        //for (Map baseMapMatch : baseMapMatchList) {
-        //
-        //    String sameTableName = (String) baseMapMatch.get("tableName");
-        //    dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
-        //    dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
-        //
-        //    List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
-        //
-        //    List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
-        //    List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
-        //
-        //    //比较方法
-        //    Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
-        //
-        //    //输出结果
-        //    logger.info("=============当前处理的表名是：" + baseMapMatch.get("tableName") + "=============");
-        //    CompareUtils.soutResult(resultColMap, "columnName", dbaCols_CompareCols);
-        //}
+            String sameTableName = (String) baseMapMatch.get("tableName");
+            dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
+            dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
+
+            List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
+
+            List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
+            List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
+
+            //比较方法
+            Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
+
+            List<Map> colsBaseMapNoMatchList = resultColMap.get("baseMapNoMatchList");
+            List<Map> colsBaseMapAllMatchList = resultColMap.get("baseMapAllMatchList");
+            List<Map> colsBaseMapPartMatchList = resultColMap.get("baseMapPartMatchList");
+            List<Map> colsTargetMapNoMatchList = resultColMap.get("targetMapNoMatchList");
+
+            String sheetNameCols = "Dba_tab_cols";
+            List<String> titleCols = dbaCols_CompareCols;
+
+            wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetNameCols, bigTitle1, titleCols, colsBaseMapNoMatchList, null);
+            wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetNameCols, bigTitle2, titleCols, colsBaseMapAllMatchList, null);
+            wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetNameCols, bigTitle3, titleCols, colsBaseMapPartMatchList, null);
+            wb = ExcelUtils.getHSSFWorkbookForDb(wb, sheetNameCols, bigTitle4, titleCols, colsTargetMapNoMatchList, null);
+
+            ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName+ ".xls");
+
+            //输出结果
+            logger.info("=============当前处理的表名是：" + baseMapMatch.get("tableName") + "=============");
+            CompareUtils.soutResult(resultColMap, "columnName", dbaCols_CompareCols);
+        }
     }
 
 

@@ -22,6 +22,7 @@ public class CompareUtils {
     public final static String matchFlag_Yes_2 = "2"; //匹配失败
     public final static String matchStatus = "matchStatus"; //匹配状态
     public final static String keyMatchStatus = "_matchStatus"; //key的匹配状态
+    public final static String diffValue = "_diffValue"; //匹配结果不一样的值
     public final static String mainColStr = "*"; //主要字段起始符号（主要字段全部匹配，可以标记此字段匹配过了）
 
 /**
@@ -95,18 +96,23 @@ public class CompareUtils {
 
                     //匹配成功，记录每个属性的对比结果 与 匹配成功数
                     if (compareStr(baseCol, targetCol)) {
+                        //记录该字段的匹配成功
                         baseObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_1);
                         targetObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_1);
                         matchNum++;
                     }else{
 
                         //主要字段匹配失败，跳过 匹配队列(第二个循环）的此对象
+                        //注意，主要字段只能有一个！！！
                         if(mainColFlag){
                             break;
                         }
 
+                        //记录该字段的匹配失败，并记录失败值
                         baseObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_2);
                         targetObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_2);
+                        baseObjMap.put(compareCol + diffValue, targetCol);
+                        targetObjMap.put(compareCol + diffValue, baseCol);
                     }
                 }
 
@@ -267,6 +273,8 @@ public class CompareUtils {
             //循环所有需要匹配的列
             for (int j = 0; j < compareCols.size(); j++) {
                 String compareCol = compareCols.get(j);
+
+                //去掉下划线，变成驼峰命名
                 compareCol = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
 
                 boolean mainColFlag = false;
@@ -281,6 +289,7 @@ public class CompareUtils {
 
                 //匹配成功，记录每个属性的对比结果 与 匹配成功数
                 if (compareStr(baseCol, targetCol)) {
+                    //记录该字段的匹配成功
                     baseObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_1);
                     targetObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_1);
                     matchNum++;
@@ -291,8 +300,11 @@ public class CompareUtils {
                         break;
                     }
 
+                    //记录该字段的匹配失败，并记录失败值
                     baseObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_2);
                     targetObjMap.put(compareCol + keyMatchStatus, CompareUtils.matchFlag_Yes_2);
+                    baseObjMap.put(compareCol + diffValue, targetCol);
+                    targetObjMap.put(compareCol + diffValue, baseCol);
                 }
             }
 
@@ -483,6 +495,12 @@ public class CompareUtils {
     public static String strToHumpAndNoStar(String compareCol) {
         String col = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
         col = col.replace("*", "");
+        return col;
+    }
+
+    public static String strToHumpAndNoMin(String compareCol) {
+        String col = CommonUtils.strTrimLowlineAndRenameHump(compareCol);
+        col = col.replace("-", "");
         return col;
     }
 
