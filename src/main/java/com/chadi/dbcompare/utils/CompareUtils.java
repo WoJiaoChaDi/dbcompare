@@ -24,6 +24,10 @@ public class CompareUtils {
     public final static String keyMatchStatus = "_matchStatus"; //key的匹配状态
     public final static String diffValue = "_diffValue"; //匹配结果不一样的值
     public final static String mainColStr = "*"; //主要字段起始符号（主要字段全部匹配，可以标记此字段匹配过了）
+    public final static String dataType_01 = "01"; //01-DB1有、DB2无
+    public final static String dataType_02 = "02"; //02-DB1、DB2完全匹配
+    public final static String dataType_03 = "03"; //03-DB1、DB2部分匹配
+    public final static String dataType_04 = "04"; //04-DB1无、DB2
 
 /**
  * @description: 根据compareCols的列名，对比两个List内的对象字段的值是否相同

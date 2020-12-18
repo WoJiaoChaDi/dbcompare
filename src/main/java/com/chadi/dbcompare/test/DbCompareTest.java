@@ -102,8 +102,120 @@ public class DbCompareTest {
 
     }
 
+    /**
+     * @description: 双DB左右对比，黄色标注不一样字段
+     * @param
+     * @return: void
+     * @author: XuDong
+     * @time: 2020/12/18 14:47
+     */
     @Test
-    public void test_exportExcel_DbaTables(){
+    public void test_exportExcel_DbaTables_ShowTwoDB(){
+
+        DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
+        DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTablesMapper.class);
+
+        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
+        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
+        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
+        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.ConsCols");
+
+
+        List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
+        List<DbaTables> dbaTables_TargetList = dbaTables_db2.getDba_tablesByPros(dbaTables_CompareMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
+
+        //比较方法
+        Map<String, List> resultMap = CompareUtils.compareList(dbaTables_BaseList, dbaTables_TargetList, dbaTables_CompareCols);
+
+        // 下载后文件的名称
+        String fileName = "DbTestExcel.xls";
+
+        String bigTitle1 = "DB1有，DB2中无";
+        List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
+        String bigTitle2 = "DB1有，DB2也有";
+        List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
+        String bigTitle3 = "DB1有，DB2也有，但是匹配字段不完全一致";
+        List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
+        String bigTitle4 = "DB1无，DB2有";
+        List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
+
+
+        //sheet名
+        String sheetName = "DbaTables";
+        // excel的标题
+        List<String> titleTables = dbaTables_CompareCols;
+        // 建HSSFWorkbook
+        // 第一步，创建一个HSSFWorkbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+
+        //先给页面添加列标题
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, true, null, 0, null);
+
+        //填充数据
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, false, baseMapNoMatchList, null, CompareUtils.dataType_01);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables,false, baseMapAllMatchList, null, CompareUtils.dataType_02);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables,false, baseMapPartMatchList, null, CompareUtils.dataType_03);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables,false, targetMapNoMatchList, null, CompareUtils.dataType_04);
+
+        //字段比较
+        List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
+        //库表字段
+        DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
+        DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
+
+        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
+        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
+        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
+        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
+
+        //每次循环一个表名 匹配列
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
+
+        //先给页面添加列标题
+        String sheetNameCols = "Dba_tab_cols";
+        List<String> titleCols = dbaCols_CompareCols;
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, true, null, 0, null);
+
+        for (Map baseMapMatch : baseMapMatchList) {
+
+            String sameTableName = (String) baseMapMatch.get("tableName");
+            dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
+            dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
+
+            List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
+            List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
+
+            //比较方法
+            Map<String, List> resultColMap = CompareUtils.compareList(dbaCols_BaseList, dbaCols_TargetList, dbaCols_CompareCols);
+
+            List<Map> colsBaseMapNoMatchList = resultColMap.get("baseMapNoMatchList");
+            List<Map> colsBaseMapAllMatchList = resultColMap.get("baseMapAllMatchList");
+            List<Map> colsBaseMapPartMatchList = resultColMap.get("baseMapPartMatchList");
+            List<Map> colsTargetMapNoMatchList = resultColMap.get("targetMapNoMatchList");
+
+            wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, false, colsBaseMapNoMatchList, null, CompareUtils.dataType_01);
+            wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, false, colsBaseMapAllMatchList, null, CompareUtils.dataType_02);
+            wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, false, colsBaseMapPartMatchList, null, CompareUtils.dataType_03);
+            wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, false, colsTargetMapNoMatchList, null, CompareUtils.dataType_04);
+
+            //输出结果
+            logger.info("=============当前处理的表名是：" + baseMapMatch.get("tableName") + "=============");
+            CompareUtils.soutResult(resultColMap, "columnName", dbaCols_CompareCols);
+        }
+        ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName+ "---1.xls");
+    }
+
+    /**
+     * @description: 单DB内对比，黄色标注不一样字段  字段内左右区分DB1 DB2
+     * @param
+     * @return: void
+     * @author: XuDong
+     * @time: 2020/12/18 14:47
+     */
+    @Test
+    public void test_exportExcel_DbaTables_ShowOneDB(){
+
         DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
         DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTablesMapper.class);
 
