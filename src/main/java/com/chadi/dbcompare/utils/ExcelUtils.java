@@ -2,7 +2,6 @@ package com.chadi.dbcompare.utils;
 
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -109,19 +108,19 @@ public class ExcelUtils {
 
 
     /**
-     * @param wb
-     * @param sheetName
-     * @param bigTitle
-     * @param titles
-     * @param values
-     * @param rowCount
-     * @param dataType  数据类型：1-DB1有、DB2无    2-DB1、DB2完全匹配   3-DB1、DB2部分匹配   4-DB1无、DB2有
+     * @param wb           HSSFWorkbook对象
+     * @param sheetName    Sheet页名
+     * @param dbInfoList  数据库名字，只取list前两个，合并大小根据 titles长度
+     * @param titleCols      列名称
+     * @param values      值
+     * @param rowCount    如果是null，则从已有数据的下一行开始拼接。如果非null，则按具体值开始往下填充
+     * @param dataType    数据类型：1-DB1有、DB2无    2-DB1、DB2完全匹配   3-DB1、DB2部分匹配   4-DB1无、DB2有
      * @description: 填充Excel 两列DB对比
      * @return: org.apache.poi.hssf.usermodel.HSSFWorkbook
      * @author: XuDong
      * @time: 2020/12/17 17:20
      */
-    public static HSSFWorkbook getHSSFWorkbookForDbRightLeft(HSSFWorkbook wb, String sheetName, String bigTitle, List<String> titles, boolean titlesFlag, List<Map> values, Integer rowCount, String dataType) {
+    public static HSSFWorkbook getHSSFWorkbookForDbRightLeft(HSSFWorkbook wb, String sheetName, List<String> dbInfoList, List<String> titleCols, boolean titlesFlag, List<Map> values, Integer rowCount, String dataType) {
 
         // 第二步，在workbook中添加一个sheet,对应Excel文件中的sheet
         HSSFSheet sheet = wb.getSheet(sheetName);
@@ -165,21 +164,45 @@ public class ExcelUtils {
         //valueCellStyle.setFillBackgroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
         valueCellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
 
+        //DB1、DB2之间的间隔列
+        HSSFCellStyle splitCellStyle = wb.createCellStyle();
+        splitCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        splitCellStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+
 
         // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制
         HSSFRow row = null;
         HSSFCell cell = null;
 
         // 填写大标题
-        if (!StringUtils.isEmpty(bigTitle)) {
+        if (!CollectionUtils.isEmpty(dbInfoList)) {
             row = sheet.createRow(rowCount);
+
+            //合并单元格左右
+            int db1ColLeft = 0;
+            int db1ColRight = titleCols.size()-1;
+            int db2ColLeft = titleCols.size()+1;
+            int db2ColRight = db2ColLeft+titleCols.size()-1;
+
             int bitTitleRow = rowCount;
             rowCount++;
             cell = row.createCell(0);
-            cell.setCellValue(bigTitle);
+            cell.setCellValue(dbInfoList.get(0));
             cell.setCellStyle(bigTitleCellStyle);
-            // 单元格合并  四个参数分别是：起始行，起始列，结束行，结束列
-            sheet.addMergedRegion(new CellRangeAddress(bitTitleRow, (bitTitleRow), 0, 5));
+            //单元格合并
+            if(db1ColLeft < db1ColRight){
+                // 四个参数分别是：起始行，起始列，结束行，结束列
+                sheet.addMergedRegion(new CellRangeAddress(bitTitleRow, bitTitleRow, db1ColLeft, db1ColRight));
+            }
+
+            cell = row.createCell(db2ColLeft);
+            cell.setCellValue(dbInfoList.get(1));
+            cell.setCellStyle(bigTitleCellStyle);
+            //单元格合并
+            if(db2ColLeft < db2ColRight){
+                // 四个参数分别是：起始行，起始列，结束行，结束列
+                sheet.addMergedRegion(new CellRangeAddress(bitTitleRow, bitTitleRow, db2ColLeft, db2ColRight));
+            }
         }
 
         if (titlesFlag) {
@@ -189,9 +212,9 @@ public class ExcelUtils {
 
             int cellCount = 0;
             //DB1标题
-            for (int i =0; i < titles.size(); i++) {
+            for (int i =0; i < titleCols.size(); i++) {
                 cell = row.createCell(i);
-                cell.setCellValue(titles.get(i));
+                cell.setCellValue(titleCols.get(i));
                 cell.setCellStyle(titleCellStyle);
                 cellCount = i + 1;
             }
@@ -199,9 +222,9 @@ public class ExcelUtils {
             cellCount += 1;
 
             //DB2标题
-            for (int i =0; i < titles.size(); i++) {
+            for (int i =0; i < titleCols.size(); i++) {
                 cell = row.createCell(cellCount+i);
-                cell.setCellValue(titles.get(i));
+                cell.setCellValue(titleCols.get(i));
                 cell.setCellStyle(titleCellStyle);
             }
         }
@@ -216,10 +239,10 @@ public class ExcelUtils {
 
                 //列出DB1的数据(左边的数据）
                 if(!CompareUtils.dataType_04.equals(dataType)){
-                    for (int j = 0; j < titles.size(); j++) {
+                    for (int j = 0; j < titleCols.size(); j++) {
                         //将内容按顺序赋给对应的列对象
                         Map valueMap = values.get(i);
-                        String title = titles.get(j);
+                        String title = titleCols.get(j);
 
                         HSSFCell valueCell = row.createCell(j);
                         //去掉-号
@@ -238,90 +261,99 @@ public class ExcelUtils {
                         cellCount = j + 1;
                     }
 
+                    //DB1 DB2之间的间隔列
                     //空一格
+                    HSSFCell splitCell = row.createCell(cellCount);
+                    splitCell.setCellStyle(splitCellStyle);
                     cellCount++;
-                }
 
-                //如果类型是DB2不匹配，即 DB1中有，DB2中无，需要把DB2的空白填充成黄色
-                if(CompareUtils.dataType_01.equals(dataType)) {
-                    for (int j = 0; j < titles.size(); j++) {
-                        HSSFCell valueCell = row.createCell(cellCount + j);
-                        valueCell.setCellValue("");
-                        valueCell.setCellStyle(valueCellStyle);
-                    }
-                }
-
-                //如果类型是完全匹配，DB1、DB2 完全匹配
-                if(CompareUtils.dataType_02.equals(dataType)){
-
-                    for (int j = 0; j < titles.size(); j++) {
-                        //将内容按顺序赋给对应的列对象
-                        Map valueMap = values.get(i);
-                        String title = titles.get(j);
-
-                        HSSFCell valueCell = row.createCell(cellCount+j);
-                        //去掉-号
-                        title = CompareUtils.strTrimMin(title);
-                        //去掉*号
-                        String key = CompareUtils.strToHumpAndNoStar(title);
-                        String value = (String) valueMap.get(key);
-
-                        //判断字段匹配失败，DB2的值
-                        if(CompareUtils.matchFlag_Yes_2.equals(valueMap.get(key + CompareUtils.keyMatchStatus))){
-                            String diffValue = (String) valueMap.get(key + CompareUtils.diffValue);
-                            valueCell.setCellValue(diffValue);
+                    //如果类型是DB2不匹配，即 DB1中有，DB2中无，需要把DB2的空白填充成黄色
+                    if(CompareUtils.dataType_01.equals(dataType)) {
+                        for (int j = 0; j < titleCols.size(); j++) {
+                            HSSFCell valueCell = row.createCell(cellCount + j);
+                            valueCell.setCellValue("");
                             valueCell.setCellStyle(valueCellStyle);
-                        }else{
-                            valueCell.setCellValue(value);
                         }
-
                     }
-                }
 
-                //如果类型是非完全匹配，即DB1、DB2有，但是部分不匹配，需要把DB2的数据列出来
-                if(CompareUtils.dataType_03.equals(dataType)){
+                    //如果类型是完全匹配，DB1、DB2 完全匹配，右边列出DB2的部分
+                    if(CompareUtils.dataType_02.equals(dataType)){
 
-                    for (int j = 0; j < titles.size(); j++) {
-                        //将内容按顺序赋给对应的列对象
-                        Map valueMap = values.get(i);
-                        String title = titles.get(j);
+                        for (int j = 0; j < titleCols.size(); j++) {
+                            //将内容按顺序赋给对应的列对象
+                            Map valueMap = values.get(i);
+                            String title = titleCols.get(j);
 
-                        HSSFCell valueCell = row.createCell(cellCount+j);
-                        //去掉-号
-                        title = CompareUtils.strTrimMin(title);
-                        //去掉*号
-                        String key = CompareUtils.strToHumpAndNoStar(title);
-                        String value = (String) valueMap.get(key);
+                            HSSFCell valueCell = row.createCell(cellCount+j);
+                            //去掉-号
+                            title = CompareUtils.strTrimMin(title);
+                            //去掉*号
+                            String key = CompareUtils.strToHumpAndNoStar(title);
+                            String value = (String) valueMap.get(key);
 
-                        //判断字段匹配失败，DB2的值
-                        if(CompareUtils.matchFlag_Yes_2.equals(valueMap.get(key + CompareUtils.keyMatchStatus))){
-                            String diffValue = (String) valueMap.get(key + CompareUtils.diffValue);
-                            valueCell.setCellValue(diffValue);
-                            valueCell.setCellStyle(valueCellStyle);
-                        }else{
-                            valueCell.setCellValue(value);
+                            //判断字段匹配失败，DB2的值
+                            if(CompareUtils.matchFlag_Yes_2.equals(valueMap.get(key + CompareUtils.keyMatchStatus))){
+                                String diffValue = (String) valueMap.get(key + CompareUtils.diffValue);
+                                valueCell.setCellValue(diffValue);
+                                valueCell.setCellStyle(valueCellStyle);
+                            }else{
+                                valueCell.setCellValue(value);
+                            }
+
                         }
-
                     }
+
+                    //如果类型是非完全匹配，即DB1、DB2有，但是部分不匹配，需要把DB2的数据列出来
+                    if(CompareUtils.dataType_03.equals(dataType)){
+
+                        for (int j = 0; j < titleCols.size(); j++) {
+                            //将内容按顺序赋给对应的列对象
+                            Map valueMap = values.get(i);
+                            String title = titleCols.get(j);
+
+                            HSSFCell valueCell = row.createCell(cellCount+j);
+                            //去掉-号
+                            title = CompareUtils.strTrimMin(title);
+                            //去掉*号
+                            String key = CompareUtils.strToHumpAndNoStar(title);
+                            String value = (String) valueMap.get(key);
+
+                            //判断字段匹配失败，DB2的值
+                            if(CompareUtils.matchFlag_Yes_2.equals(valueMap.get(key + CompareUtils.keyMatchStatus))){
+                                String diffValue = (String) valueMap.get(key + CompareUtils.diffValue);
+                                valueCell.setCellValue(diffValue);
+                                valueCell.setCellStyle(valueCellStyle);
+                            }else{
+                                valueCell.setCellValue(value);
+                            }
+
+                        }
+                    }
+
                 }
 
                 //如果类型是不匹配，即DB1中无 DB2中有，需要把DB2的数据列出来
                 if(CompareUtils.dataType_04.equals(dataType)){
 
                     //DB1的空白标黄
-                    for (int j = 0; j < titles.size(); j++) {
-                        HSSFCell valueCell = row.createCell(cellCount + j);
+                    for (int j = 0; j < titleCols.size(); j++) {
+                        HSSFCell valueCell = row.createCell( j);
                         valueCell.setCellValue("");
                         valueCell.setCellStyle(valueCellStyle);
+                        cellCount = j+1;
                     }
-                    //空出DB1 DB2空一行的列
-                    cellCount = titles.size()+1;
+
+                    //DB1 DB2之间的间隔列
+                    //空一格
+                    HSSFCell splitCell = row.createCell(cellCount);
+                    splitCell.setCellStyle(splitCellStyle);
+                    cellCount++;
 
                     //DB2的值
-                    for (int j = 0; j < titles.size(); j++) {
+                    for (int j = 0; j < titleCols.size(); j++) {
                         //将内容按顺序赋给对应的列对象
                         Map valueMap = values.get(i);
-                        String title = titles.get(j);
+                        String title = titleCols.get(j);
 
                         HSSFCell valueCell = row.createCell(cellCount+j);
                         //去掉-号

@@ -114,6 +114,10 @@ public class DbCompareTest {
 
         DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
         DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTablesMapper.class);
+        //DB名称
+        List<String> dbInfoList = new ArrayList<>();
+        dbInfoList.add("DB1");
+        dbInfoList.add("DB2");
 
         Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
         Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
@@ -149,8 +153,11 @@ public class DbCompareTest {
         // 第一步，创建一个HSSFWorkbook，对应一个Excel文件
         HSSFWorkbook wb = new HSSFWorkbook();
 
-        //先给页面添加列标题
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, true, null, 0, null);
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, dbInfoList, titleTables, false, null, 0, null);
+        //列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, true, null, null, null);
+
 
         //填充数据
         wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, false, baseMapNoMatchList, null, CompareUtils.dataType_01);
@@ -175,7 +182,11 @@ public class DbCompareTest {
         //先给页面添加列标题
         String sheetNameCols = "Dba_tab_cols";
         List<String> titleCols = dbaCols_CompareCols;
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, true, null, 0, null);
+
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, dbInfoList, titleCols, false, null, 0, null);
+        //列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, true, null, null, null);
 
         for (Map baseMapMatch : baseMapMatchList) {
 
