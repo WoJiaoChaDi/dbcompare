@@ -39,6 +39,8 @@ import java.util.logging.Logger;
  **/
 public class ExcelUtils {
 
+    private static final int cellLength = 15;
+
     private static Log log = LogFactory.getLog(ExcelUtils.class);
 
     /**
@@ -127,7 +129,7 @@ public class ExcelUtils {
             sheet = wb.createSheet(sheetName);
         }
         //设置Sheet的单元格的默认宽度
-        sheet.setDefaultColumnWidth(20);
+        sheet.setDefaultColumnWidth(ExcelUtils.cellLength);
 
         //如果没有传rowCount，则在已有的数据下拼接
         if (rowCount == null) {
@@ -363,7 +365,7 @@ public class ExcelUtils {
             sheet = wb.createSheet(sheetName);
         }
         //设置Sheet的单元格的默认宽度
-        sheet.setDefaultColumnWidth(20);
+        sheet.setDefaultColumnWidth(ExcelUtils.cellLength);
 
         //如果没有传rowCount，则在已有的数据下拼接
         if (rowCount == null) {
@@ -508,7 +510,7 @@ public class ExcelUtils {
 
         HSSFWorkbook wb = new HSSFWorkbook();//创建excel表
         HSSFSheet sheet = wb.createSheet(sheetTitle);
-        sheet.setDefaultColumnWidth(20);//设置默认行宽
+        sheet.setDefaultColumnWidth(ExcelUtils.cellLength);//设置默认行宽
 
         //表头样式（加粗，水平居中，垂直居中）
         HSSFCellStyle cellStyle = wb.createCellStyle();
