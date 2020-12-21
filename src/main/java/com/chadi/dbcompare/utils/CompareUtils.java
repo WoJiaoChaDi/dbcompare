@@ -1,7 +1,11 @@
 package com.chadi.dbcompare.utils;
 
 import com.chadi.dbcompare.bean.DbBaseObj;
+import com.chadi.dbcompare.dao.Mapper;
+import com.chadi.factory.DataSourceEnum;
+import com.chadi.factory.DataSourceSqlSessionFactory;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +32,21 @@ public class CompareUtils {
     public final static String dataType_02 = "02"; //02-DB1、DB2完全匹配
     public final static String dataType_03 = "03"; //03-DB1、DB2部分匹配
     public final static String dataType_04 = "04"; //04-DB1无、DB2
+
+    public final static String baseList = "baseList";
+    public final static String targetList = "targetList";
+    public final static String compareCols = "compareCols";
+
+
+    public final static String Dba_tables = "Dba_tables";//表
+    public final static String Dba_tab_cols = "Dba_tab_cols";//表字段
+    public final static String Dba_ind_columns = "Dba_ind_columns";//索引
+    public final static String User_indexes = "User_indexes";//索引详情
+    public final static String User_Constraints = "User_Constraints";//约束
+    public final static String User_Procedures = "User_Procedures";//存储过程、函数、触发器
+    public final static String User_Source = "User_Source";//存储过程、函数、触发器具体名
+
+
 
 /**
  * @description: 根据compareCols的列名，对比两个List内的对象字段的值是否相同
@@ -546,6 +565,57 @@ public class CompareUtils {
         } catch (Exception e) {
             logger.info("输出异常", e);
         }
+    }
+
+    public static Mapper getDbMapper(DataSourceEnum d, Class<? extends Mapper> mapperClass){
+        return DataSourceSqlSessionFactory.getTypeMapper(d, mapperClass);
+    }
+
+    public static Map<String, List> getBsTgListAndCpCols(Mapper mapper_db1, Mapper mapper_db2, String typeStr, Map moreConsColsMap){
+
+        Map baseMap = PropertyUtils.getPropertyToMap(typeStr + ".ConsCols_1");
+        Map compareMap = PropertyUtils.getPropertyToMap(typeStr + ".ConsCols_2");
+        Map notLikeMap = PropertyUtils.getPropertyToMap(typeStr + ".NotLikeMap");
+        List<String> appendPlusList = PropertyUtils.getPropertyToList(typeStr + ".AppendPlus");
+
+        //添加额外的条件
+        if (moreConsColsMap != null) {
+            baseMap.putAll(moreConsColsMap);
+            compareMap.putAll(moreConsColsMap);
+        }
+
+        List<DbBaseObj> baseList = mapper_db1.getDbBaseByPros(baseMap, notLikeMap, appendPlusList);
+        List<DbBaseObj> targetList = mapper_db2.getDbBaseByPros(compareMap, notLikeMap, appendPlusList);
+        List<String> compareCols = PropertyUtils.getPropertyToList(typeStr + ".CompareCols");
+
+        Map<String, List> sourceMap = new HashMap();
+        sourceMap.put(CompareUtils.baseList, baseList);
+        sourceMap.put(CompareUtils.targetList, targetList);
+        sourceMap.put(CompareUtils.compareCols, compareCols);
+
+        return sourceMap;
+    }
+
+    public static Map<String, List> writeDataToWbByType(Map<String, List> sourceMap, HSSFWorkbook wb, String sheetName, String dataType) {
+
+        Map<String, List> resultMap = CompareUtils.compareList(sourceMap.get(CompareUtils.baseList), sourceMap.get(CompareUtils.targetList), sourceMap.get(CompareUtils.compareCols));
+
+
+        List<Map> dataList = new ArrayList<>();
+        if(CompareUtils.dataType_01.equals(dataType)){
+            dataList = resultMap.get("baseMapNoMatchList");
+        }else if(CompareUtils.dataType_02.equals(dataType)){
+            dataList = resultMap.get("baseMapAllMatchList");
+        }else if(CompareUtils.dataType_03.equals(dataType)){
+            dataList = resultMap.get("baseMapPartMatchList");
+        }else if(CompareUtils.dataType_04.equals(dataType)){
+            dataList = resultMap.get("targetMapNoMatchList");
+        }
+        List<String> titleTables = sourceMap.get(CompareUtils.compareCols);
+
+        ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, false, dataList, null, dataType);
+
+        return resultMap;
     }
 
 }

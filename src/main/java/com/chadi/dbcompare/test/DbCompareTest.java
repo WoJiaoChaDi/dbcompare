@@ -10,6 +10,7 @@ import com.chadi.dbcompare.bean.UserSource;
 import com.chadi.dbcompare.dao.DbaIndColumnsMapper;
 import com.chadi.dbcompare.dao.DbaTabColsMapper;
 import com.chadi.dbcompare.dao.DbaTablesMapper;
+import com.chadi.dbcompare.dao.Mapper;
 import com.chadi.dbcompare.dao.UserConstraintsMapper;
 import com.chadi.dbcompare.dao.UserIndexesMapper;
 import com.chadi.dbcompare.dao.UserProceduresMapper;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -110,6 +112,94 @@ public class DbCompareTest {
      * @time: 2020/12/18 14:47
      */
     @Test
+    public void test_exportExcel_All_ShowTwoDB(){
+
+        // 下载后文件的名称
+        String fileName = "DbTestExcel_ALL_0002.xls";
+        //DB名称
+        List<String> dbInfoList = new ArrayList<>();
+        dbInfoList.add("DB1");
+        dbInfoList.add("DB2");
+
+        //---------第一个Sheet页（表名对比）---------
+        //获取数据源
+        Mapper dbaTabMapper_db1 = CompareUtils.getDbMapper(DataSourceEnum.d1, DbaTablesMapper.class);
+        Mapper dbaTabMapper_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, DbaTablesMapper.class);
+
+        //获取库表的数据源
+        Map<String, List> tabSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabMapper_db1, dbaTabMapper_db2, CompareUtils.Dba_tables, null);
+
+        //sheet名
+        String sheetName = CompareUtils.Dba_tables;
+
+        // 建HSSFWorkbook
+        // 第一步，创建一个HSSFWorkbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+
+        // excel的标题
+        List<String> titleTables = (List<String>) tabSourceMap.get(CompareUtils.compareCols);
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, dbInfoList, titleTables, false, null, 0, null);
+        //列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, true, null, null, null);
+
+        //输出比较数据
+        Map<String, List> resultMap = CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_01);
+        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_02);
+        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_03);
+        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_04);
+
+
+        //---------第二个Sheet页（列名对比：基于前一个表的对比）---------
+        //字段比较
+        List<Map> baseMapMatchList = resultMap.get("baseMapMatchList");
+
+        //获取数据源
+        Mapper dbaTabColsMpr_db1 = CompareUtils.getDbMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
+        Mapper dbaTabColsMpr_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
+
+        //每次循环一个表名 匹配列
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
+
+        //先给页面添加列标题
+        String sheetNameCols = CompareUtils.Dba_tab_cols;
+        List<String> titleCols = dbaCols_CompareCols;
+
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, dbInfoList, titleCols, false, null, 0, null);
+        //列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, true, null, null, null);
+
+        //循环匹配成功的表，比较列的匹配情况
+        for (Map baseMapMatch : baseMapMatchList) {
+
+            String sameTableName = (String) baseMapMatch.get("tableName");
+            Map moreConsColsMap = new HashMap();
+            moreConsColsMap.put("TABLE_NAME", sameTableName);
+
+            //获取表列的数据源
+            Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabColsMpr_db1, dbaTabColsMpr_db2, CompareUtils.Dba_tab_cols, moreConsColsMap);
+
+            //输出比较数据
+            CompareUtils.writeDataToWbByType(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_01);
+            CompareUtils.writeDataToWbByType(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_02);
+            CompareUtils.writeDataToWbByType(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_03);
+            CompareUtils.writeDataToWbByType(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_04);
+        }
+
+        ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName);
+    }
+
+
+
+    /**
+     * @description: 双DB左右对比，黄色标注不一样字段
+     * @param
+     * @return: void
+     * @author: XuDong
+     * @time: 2020/12/18 14:47
+     */
+    @Test
     public void test_exportExcel_DbaTables_ShowTwoDB(){
 
         DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
@@ -123,7 +213,7 @@ public class DbCompareTest {
         Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
         Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
         List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
-        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.ConsCols");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.CompareCols");
 
 
         List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
@@ -135,13 +225,9 @@ public class DbCompareTest {
         // 下载后文件的名称
         String fileName = "DbTestExcel.xls";
 
-        String bigTitle1 = "DB1有，DB2中无";
         List<Map> baseMapNoMatchList = resultMap.get("baseMapNoMatchList");
-        String bigTitle2 = "DB1有，DB2也有";
         List<Map> baseMapAllMatchList = resultMap.get("baseMapAllMatchList");
-        String bigTitle3 = "DB1有，DB2也有，但是匹配字段不完全一致";
         List<Map> baseMapPartMatchList = resultMap.get("baseMapPartMatchList");
-        String bigTitle4 = "DB1无，DB2有";
         List<Map> targetMapNoMatchList = resultMap.get("targetMapNoMatchList");
 
 
@@ -177,7 +263,7 @@ public class DbCompareTest {
         List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
 
         //每次循环一个表名 匹配列
-        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
 
         //先给页面添加列标题
         String sheetNameCols = "Dba_tab_cols";
@@ -234,7 +320,7 @@ public class DbCompareTest {
         Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
         Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
         List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
-        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.ConsCols");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.CompareCols");
 
 
         List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
@@ -288,7 +374,7 @@ public class DbCompareTest {
         List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
 
         //每次循环一个表名 匹配列
-        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
         for (Map baseMapMatch : baseMapMatchList) {
 
             String sameTableName = (String) baseMapMatch.get("tableName");
@@ -339,7 +425,7 @@ public class DbCompareTest {
         Map uPrecedure_CompareMap = PropertyUtils.getPropertyToMap("User_Procedures.ConsCols_2");
         Map uPrecedure_NotLike = PropertyUtils.getPropertyToMap("User_Procedures.NotLikeMap");
         List<String> uPrecedure_AppendPlusList = PropertyUtils.getPropertyToList("User_Procedures.AppendPlus");
-        List<String> uPrecedure_CompareCols = PropertyUtils.getPropertyToList("User_Procedures.ConsCols");
+        List<String> uPrecedure_CompareCols = PropertyUtils.getPropertyToList("User_Procedures.CompareCols");
 
         List<UserProcedures> uPrecedure_BaseList = uPrecedure_db1.getUser_proceduresByPros(uPrecedure_BaseMap, uPrecedure_NotLike, uPrecedure_AppendPlusList);
         List<UserProcedures> uPrecedure_TargetList = uPrecedure_db2.getUser_proceduresByPros(uPrecedure_CompareMap, uPrecedure_NotLike, uPrecedure_AppendPlusList);
@@ -360,7 +446,7 @@ public class DbCompareTest {
         //每次循环一个表名 匹配列
         for (Map baseMapMatch : baseMapMatchList) {
 
-            List<String> uSource_CompareCols = PropertyUtils.getPropertyToList("User_Source.ConsCols");
+            List<String> uSource_CompareCols = PropertyUtils.getPropertyToList("User_Source.CompareCols");
             String objectName = (String) baseMapMatch.get("objectName");
             String objectType = (String) baseMapMatch.get("objectType");
 
@@ -395,7 +481,7 @@ public class DbCompareTest {
         Map uConstr_CompareMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_2");
         Map uConstr_NotLike = PropertyUtils.getPropertyToMap("User_Constraints.NotLikeMap");
         List<String> uConstr_AppendPlusList = PropertyUtils.getPropertyToList("User_Constraints.AppendPlus");
-        List<String> uConstr_CompareCols = PropertyUtils.getPropertyToList("User_Constraints.ConsCols");
+        List<String> uConstr_CompareCols = PropertyUtils.getPropertyToList("User_Constraints.CompareCols");
 
         List<UserConstraints> uConstr_BaseList = uConstr_db1.getUser_ConstraintsByPros(uConstr_BaseMap, uConstr_NotLike, uConstr_AppendPlusList);
         List<UserConstraints> uConstr_TargetList = uConstr_db2.getUser_ConstraintsByPros(uConstr_CompareMap, uConstr_NotLike, uConstr_AppendPlusList);
@@ -423,7 +509,7 @@ public class DbCompareTest {
         Map dbaIndex_CompareMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_2");
         Map dbaIndex_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.NotLikeMap");
         List<String> dbaIndex_AppendPlusList = PropertyUtils.getPropertyToList("Dba_ind_columns.AppendPlus");
-        List<String> dbaIndex_CompareCols = PropertyUtils.getPropertyToList("Dba_ind_columns.ConsCols");
+        List<String> dbaIndex_CompareCols = PropertyUtils.getPropertyToList("Dba_ind_columns.CompareCols");
 
         List<DbaIndColumns> dbaIndex_BaseList = dbaIndex_db1.getDba_ind_columnsByPros(dbaIndex_BaseMap, dbaIndex_NotLikeMap, dbaIndex_AppendPlusList);
         List<DbaIndColumns> dbaIndex_TargetList = dbaIndex_db2.getDba_ind_columnsByPros(dbaIndex_CompareMap, dbaIndex_NotLikeMap, dbaIndex_AppendPlusList);
@@ -444,7 +530,7 @@ public class DbCompareTest {
         Map uIndex_NotLikeMap = PropertyUtils.getPropertyToMap("User_indexes.NotLikeMap");
         List<String> uIndex_AppendPlusList = PropertyUtils.getPropertyToList("User_indexes.AppendPlus");
 
-        List<String> uIndex_CompareCols = PropertyUtils.getPropertyToList("User_indexes.ConsCols");
+        List<String> uIndex_CompareCols = PropertyUtils.getPropertyToList("User_indexes.CompareCols");
         List<UserIndexes> uIndex_BaseList = uIndex_db1.getUser_indexesByPros(uIndex_BaseMap, uIndex_NotLikeMap, uIndex_AppendPlusList);
         List<UserIndexes> uIndex_TargetList = uIndex_db2.getUser_indexesByPros(uIndex_CompareMap, uIndex_NotLikeMap, uIndex_AppendPlusList);
 
@@ -477,7 +563,7 @@ public class DbCompareTest {
         Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
         Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
         List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
-        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.ConsCols");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.CompareCols");
 
 
         List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
@@ -507,7 +593,7 @@ public class DbCompareTest {
             dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
             dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
 
-            List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.ConsCols");
+            List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
 
             List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
             List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);

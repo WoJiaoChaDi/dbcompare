@@ -16,5 +16,4 @@ public interface DbaTablesMapper extends Mapper {
     public List<DbaTables> getDba_tablesByPros(@Param("constantColMap") Map constantColMap,
                                                @Param("notLikeMap") Map notLikeMap,
                                                @Param("appendPlusList") List appendPlusList);
-
 }

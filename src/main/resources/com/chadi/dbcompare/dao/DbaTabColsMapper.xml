@@ -43,4 +43,33 @@
 
     </select>
 
+    <!--返回List-->
+    <select id="getDbBaseByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaTabCols">
+		SELECT
+        t1.OWNER, t1.TABLE_NAME, t1.COLUMN_NAME, t1.DATA_TYPE, t1.DATA_TYPE_MOD, t1.DATA_TYPE_OWNER, t1.DATA_LENGTH, t1.DATA_PRECISION, t1.DATA_SCALE, t1.NULLABLE, t1.COLUMN_ID, t1.DEFAULT_LENGTH,
+--         t1.DATA_DEFAULT, long类型无法处理
+        t1.NUM_DISTINCT, t1.LOW_VALUE, t1.HIGH_VALUE, t1.DENSITY, t1.NUM_NULLS, t1.NUM_BUCKETS, t1.LAST_ANALYZED, t1.SAMPLE_SIZE, t1.CHARACTER_SET_NAME, t1.CHAR_COL_DECL_LENGTH, t1.GLOBAL_STATS, t1.USER_STATS, t1.AVG_COL_LEN, t1.CHAR_LENGTH, t1.CHAR_USED, t1.V80_FMT_IMAGE, t1.DATA_UPGRADED, t1.HIDDEN_COLUMN, t1.VIRTUAL_COLUMN, t1.SEGMENT_COLUMN_ID, t1.INTERNAL_COLUMN_ID, t1.HISTOGRAM, t1.QUALIFIED_COL_NAME
+        FROM dba_tab_cols t1
+        where 1=1
+
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
+        </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by  t1.OWNER, t1.TABLE_NAME, t1.COLUMN_NAME
+
+    </select>
+
 </mapper>

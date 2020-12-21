@@ -36,4 +36,30 @@
         order by t1.TABLESPACE_NAME, t1.OWNER, t1.TABLE_NAME
     </select>
 
+    <!--返回List-->
+    <select id="getDbBaseByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaTables">
+		SELECT
+        t1.OWNER, t1.TABLE_NAME, t1.TABLESPACE_NAME, t1.CLUSTER_NAME, t1.IOT_NAME, t1.STATUS, t1.PCT_FREE, t1.PCT_USED, t1.INI_TRANS, t1.MAX_TRANS, t1.INITIAL_EXTENT, t1.NEXT_EXTENT, t1.MIN_EXTENTS, t1.MAX_EXTENTS, t1.PCT_INCREASE, t1.FREELISTS, t1.FREELIST_GROUPS, t1.LOGGING, t1.BACKED_UP, t1.NUM_ROWS, t1.BLOCKS, t1.EMPTY_BLOCKS, t1.AVG_SPACE, t1.CHAIN_CNT, t1.AVG_ROW_LEN, t1.AVG_SPACE_FREELIST_BLOCKS, t1.NUM_FREELIST_BLOCKS, t1.DEGREE, t1.INSTANCES, t1.CACHE, t1.TABLE_LOCK, t1.SAMPLE_SIZE, t1.LAST_ANALYZED, t1.PARTITIONED, t1.IOT_TYPE, t1.TEMPORARY, t1.SECONDARY, t1.NESTED, t1.BUFFER_POOL, t1.FLASH_CACHE, t1.CELL_FLASH_CACHE, t1.ROW_MOVEMENT, t1.GLOBAL_STATS, t1.USER_STATS, t1.DURATION, t1.SKIP_CORRUPT, t1.MONITORING, t1.CLUSTER_OWNER, t1.DEPENDENCIES, t1.COMPRESSION, t1.COMPRESS_FOR, t1.DROPPED, t1.READ_ONLY, t1.SEGMENT_CREATED, t1.RESULT_CACHE
+        FROM dba_tables t1
+        where 1=1
+
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
+        </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.TABLESPACE_NAME, t1.OWNER, t1.TABLE_NAME
+    </select>
+
 </mapper>
