@@ -152,6 +152,8 @@ public class ExcelUtils {
         font.setColor(Font.COLOR_RED);
         font.setBold(true);
         titleCellStyle.setFont(font);
+        titleCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        titleCellStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
 
         //值单元格样式（突出）
         HSSFCellStyle valueCellStyle = wb.createCellStyle();
@@ -258,6 +260,12 @@ public class ExcelUtils {
                         }else{
                             valueCell.setCellValue(value);
                         }
+
+                        //如果类型是DB2不匹配，即 DB1中有，DB2中无，把左边所有填充成黄色
+                        if(CompareUtils.dataType_01.equals(dataType)){
+                            valueCell.setCellStyle(valueCellStyle);
+                        }
+
                         cellCount = j + 1;
                     }
 
@@ -299,7 +307,6 @@ public class ExcelUtils {
                             }else{
                                 valueCell.setCellValue(value);
                             }
-
                         }
                     }
 
@@ -332,7 +339,7 @@ public class ExcelUtils {
 
                 }
 
-                //如果类型是不匹配，即DB1中无 DB2中有，需要把DB2的数据列出来
+                //如果类型是不匹配，即DB1中无 DB2中有，需要把DB2的数据列出来，并填充成黄色
                 if(CompareUtils.dataType_04.equals(dataType)){
 
                     //DB1的空白标黄
@@ -364,6 +371,8 @@ public class ExcelUtils {
 
                         //无需判断，直接列出DB2的值
                         valueCell.setCellValue(value);
+                        //把DB2全部填充成黄色
+                        valueCell.setCellStyle(valueCellStyle);
                     }
                 }
 
