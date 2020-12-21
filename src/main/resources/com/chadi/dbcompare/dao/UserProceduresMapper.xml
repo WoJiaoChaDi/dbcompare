@@ -32,4 +32,32 @@
 
     </select>
 
+    <!--返回List-->
+    <select id="getDbBaseByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.UserProcedures">
+		SELECT t1.OBJECT_NAME, t1.PROCEDURE_NAME, t1.OBJECT_ID, t1.SUBPROGRAM_ID, t1.OVERLOAD, t1.OBJECT_TYPE, t1.AGGREGATE, t1.PIPELINED, t1.IMPLTYPEOWNER, t1.IMPLTYPENAME, t1.PARALLEL, t1.INTERFACE, t1.DETERMINISTIC, t1.AUTHID
+        FROM User_procedures t1
+        where 1=1
+
+        <if test="constantColMap != null">
+            <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} = #{constantColMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.OBJECT_TYPE asc, t1.OBJECT_NAME asc
+
+    </select>
+
 </mapper>

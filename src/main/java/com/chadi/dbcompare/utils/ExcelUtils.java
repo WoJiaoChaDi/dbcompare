@@ -242,7 +242,7 @@ public class ExcelUtils {
                     for (int j = 0; j < titleCols.size(); j++) {
                         //将内容按顺序赋给对应的列对象
                         Map valueMap = values.get(i);
-                        String title = titleCols.get(j);
+                        String title = titleCols.get(j).trim();
 
                         HSSFCell valueCell = row.createCell(j);
                         //去掉-号

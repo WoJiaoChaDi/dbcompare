@@ -20,4 +20,20 @@
 
     </select>
 
+    <!--返回List-->
+    <select id="getDbBaseByPros" resultType="com.chadi.dbcompare.bean.UserSource">
+        SELECT t.NAME, t.TYPE, t.LINE, t.TEXT FROM user_source t
+        where 1=1
+        <if test="name != null">
+            and t.name = #{name}
+        </if>
+
+        <if test="type != null">
+            and t.type = #{type}
+        </if>
+
+        order by t.line asc
+
+    </select>
+
 </mapper>

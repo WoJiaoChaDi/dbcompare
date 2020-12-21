@@ -30,4 +30,30 @@
 
     </select>
 
+    <!--返回List-->
+    <select id="getDbBaseByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaIndColumns">
+		SELECT t1.INDEX_OWNER, t1.INDEX_NAME, t1.TABLE_OWNER, t1.TABLE_NAME, t1.COLUMN_NAME, t1.COLUMN_POSITION, t1.COLUMN_LENGTH, t1.CHAR_LENGTH, t1.DESCEND
+        FROM Dba_ind_columns t1
+        where 1=1
+
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
+        </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.INDEX_OWNER, t1.TABLE_OWNER, t1.TABLE_NAME, t1.INDEX_NAME, t1.COLUMN_POSITION
+
+    </select>
+
 </mapper>

@@ -40,8 +40,8 @@ public class CompareUtils {
 
     public final static String Dba_tables = "Dba_tables";//表
     public final static String Dba_tab_cols = "Dba_tab_cols";//表字段
-    public final static String Dba_ind_columns = "Dba_ind_columns";//索引
     public final static String User_indexes = "User_indexes";//索引详情
+    public final static String Dba_ind_columns = "Dba_ind_columns";//索引
     public final static String User_Constraints = "User_Constraints";//约束
     public final static String User_Procedures = "User_Procedures";//存储过程、函数、触发器
     public final static String User_Source = "User_Source";//存储过程、函数、触发器具体名
@@ -260,7 +260,7 @@ public class CompareUtils {
      * @author: XuDong
      * @time: 2020/12/16 16:39
      */
-    public static Map<String, List> compareListByLine(List<? extends DbBaseObj> baseList, List<? extends DbBaseObj> targetList, List<String> compareCols) throws IllegalAccessException {
+    public static Map<String, List> compareListByLine(List<? extends DbBaseObj> baseList, List<? extends DbBaseObj> targetList, List<String> compareCols) {
 
         Map<String, List> resultMap = new HashMap<>();
 
@@ -599,6 +599,28 @@ public class CompareUtils {
     public static Map<String, List> writeDataToWbByType(Map<String, List> sourceMap, HSSFWorkbook wb, String sheetName, String dataType) {
 
         Map<String, List> resultMap = CompareUtils.compareList(sourceMap.get(CompareUtils.baseList), sourceMap.get(CompareUtils.targetList), sourceMap.get(CompareUtils.compareCols));
+
+
+        List<Map> dataList = new ArrayList<>();
+        if(CompareUtils.dataType_01.equals(dataType)){
+            dataList = resultMap.get("baseMapNoMatchList");
+        }else if(CompareUtils.dataType_02.equals(dataType)){
+            dataList = resultMap.get("baseMapAllMatchList");
+        }else if(CompareUtils.dataType_03.equals(dataType)){
+            dataList = resultMap.get("baseMapPartMatchList");
+        }else if(CompareUtils.dataType_04.equals(dataType)){
+            dataList = resultMap.get("targetMapNoMatchList");
+        }
+        List<String> titleTables = sourceMap.get(CompareUtils.compareCols);
+
+        ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, false, dataList, null, dataType);
+
+        return resultMap;
+    }
+
+    public static Map<String, List> writeDataToWbByTypeLine(Map<String, List> sourceMap, HSSFWorkbook wb, String sheetName, String dataType) {
+
+        Map<String, List> resultMap = CompareUtils.compareListByLine(sourceMap.get(CompareUtils.baseList), sourceMap.get(CompareUtils.targetList), sourceMap.get(CompareUtils.compareCols));
 
 
         List<Map> dataList = new ArrayList<>();

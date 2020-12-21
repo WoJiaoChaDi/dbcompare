@@ -43,4 +43,43 @@
 
     </select>
 
+    <!--返回List-->
+    <select id="getDbBaseByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.UserConstraints">
+		SELECT
+        t1.OWNER, t1.CONSTRAINT_NAME, t1.CONSTRAINT_TYPE, t1.TABLE_NAME,
+        --t1.SEARCH_CONDITION,
+        t1.R_OWNER, t1.R_CONSTRAINT_NAME, t1.DELETE_RULE, t1.STATUS, t1.DEFERRABLE, t1.DEFERRED, t1.VALIDATED, t1.GENERATED, t1.BAD, t1.RELY, t1.LAST_CHANGE, t1.INDEX_OWNER, t1.INDEX_NAME, t1.INVALID, t1.VIEW_RELATED
+        FROM User_Constraints t1
+        where 1=1
+
+        <foreach collection="params.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{params[${key}]}
+        </foreach>
+
+        <!-- 由于mybatis是所有sql拼接完成后，再对bind的参数赋值，所以多次foreach中notLikeMapTmp会被覆盖 -->
+        <!--<if test="notLikeListMap != null">-->
+            <!--<foreach collection="notLikeListMap" item="notLikeMap" open="" close="" separator="" index="index">-->
+                <!--<bind name="notLikeMapTmp" value="notLikeListMap[index]"></bind>-->
+                <!--<foreach collection="notLikeMapTmp.keys" item="key" open="and" close="" separator="and" >-->
+                    <!--t1.${key} not like #{notLikeMapTmp[${key}]}-->
+                <!--</foreach>-->
+            <!--</foreach>-->
+        <!--</if>-->
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.OWNER, t1.TABLE_NAME, t1.CONSTRAINT_NAME
+
+    </select>
+
 </mapper>
