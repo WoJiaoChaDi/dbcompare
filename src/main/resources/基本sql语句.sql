@@ -83,5 +83,32 @@ FOR EACH ROW
   END;
 
 
+--方法比较
+CREATE OR REPLACE FUNCTION fun_01(i IN NUMBER) AS
+BEGIN
+       dbms_output.put_line('1');
+END proce_01;
+
+CREATE OR REPLACE FUNCTION fun_02(i IN NUMBER) AS
+BEGIN
+       dbms_output.put_line('123');
+END proce_01;
+
+CREATE OR REPLACE FUNCTION fun_03(i IN NUMBER) AS
+BEGIN
+       dbms_output.put_line('3');
+END proce_01;
+
+CREATE OR REPLACE FUNCTION fun_04(i IN NUMBER) AS
+BEGIN
+       dbms_output.put_line('4');
+END proce_01;
+
+CREATE OR REPLACE FUNCTION fun_05(i IN NUMBER) AS
+BEGIN
+       dbms_output.put_line('5');
+END proce_01;
+
+
 
 
