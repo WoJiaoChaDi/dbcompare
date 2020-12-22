@@ -599,7 +599,7 @@ public class CompareUtils {
         return sourceMap;
     }
 
-    public static Map<String, List> writeDataToWbByType(Map<String, List> sourceMap, HSSFWorkbook wb, String sheetName, String dataType) {
+    public static Map<String, List> writeDataToWbByType(Map<String, List> sourceMap, HSSFWorkbook wb, String sheetName, String dataType, Map<String, HSSFCellStyle> styleMap) {
 
         Map<String, List> resultMap = CompareUtils.compareList(sourceMap.get(CompareUtils.baseList), sourceMap.get(CompareUtils.targetList), sourceMap.get(CompareUtils.compareCols));
 
@@ -616,13 +616,12 @@ public class CompareUtils {
         }
         List<String> titleTables = sourceMap.get(CompareUtils.compareCols);
 
-        Map<String, HSSFCellStyle> styleMap = ExcelUtils.getHSSFCellStyle(wb);
         ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, null, titleTables, false, dataList, null, dataType, styleMap);
 
         return resultMap;
     }
 
-    public static Map<String, List> writeDataToWbByTypeLine(Map<String, List> sourceMap, HSSFWorkbook wb, String sheetName, String dataType) {
+    public static Map<String, List> writeDataToWbByTypeLine(Map<String, List> sourceMap, HSSFWorkbook wb, String sheetName, String dataType, Map<String, HSSFCellStyle> styleMap) {
 
         Map<String, List> resultMap = CompareUtils.compareListByLine(sourceMap.get(CompareUtils.baseList), sourceMap.get(CompareUtils.targetList), sourceMap.get(CompareUtils.compareCols));
 
@@ -639,7 +638,6 @@ public class CompareUtils {
         }
         List<String> titleTables = sourceMap.get(CompareUtils.compareCols);
 
-        Map<String, HSSFCellStyle> styleMap = ExcelUtils.getHSSFCellStyle(wb);
         ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, null, titleTables, false, dataList, null, dataType, styleMap);
 
         return resultMap;

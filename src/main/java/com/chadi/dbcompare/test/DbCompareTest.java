@@ -117,6 +117,7 @@ public class DbCompareTest {
     @Test
     public void test_exportExcel_All_ShowTwoDB(){
 
+
         // 下载后文件的名称
         String fileName = "DbTestExcel_ALL_0005.xls";
         //DB名称
@@ -148,10 +149,10 @@ public class DbCompareTest {
         wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, null, titleTables, true, null, null, null, styleMap);
 
         //输出比较数据
-        Map<String, List> resultMap = CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_01);
-        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_02);
-        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_03);
-        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_04);
+        Map<String, List> resultMap = CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_04, styleMap);
 
 
         //---------第二个Sheet页（列名对比：基于前一个表的对比结果）---------
@@ -185,10 +186,10 @@ public class DbCompareTest {
             Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabColsMpr_db1, dbaTabColsMpr_db2, sheetNameCols, moreConsColsMap);
 
             //输出比较数据
-            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_01);
-            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_02);
-            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_03);
-            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_04);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_04, styleMap);
         }
 
 
@@ -217,10 +218,10 @@ public class DbCompareTest {
         wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urIdxsheetName, null, titleUrIdx, true, null, null, null, styleMap);
 
         //输出比较数据
-        Map<String, List> urIdxResultMap = CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_01);
-        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02);
-        CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_03);
-        CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_04);
+        Map<String, List> urIdxResultMap = CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_04, styleMap);
 
 
         //---------第四个Sheet页（索引详情对比:基于前一个索引的对比结果）---------
@@ -254,10 +255,10 @@ public class DbCompareTest {
             Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaIndColsMpr_db1, dbaIndColsMpr_db2, sheetNameDbaInd, moreConsColsMap);
 
             //输出比较数据
-            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_01);
-            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02);
-            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_03);
-            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_04);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_04, styleMap);
         }
 
 
@@ -286,10 +287,10 @@ public class DbCompareTest {
         wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urCostSheetName, null, titleUrCost, true, null, null, null, styleMap);
 
         //输出比较数据
-        Map<String, List> urCostResultMap = CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_01);
-        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02);
-        CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_03);
-        CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_04);
+        Map<String, List> urCostResultMap = CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_04, styleMap);
 
 
         //---------第六个Sheet页（约束详情对比:基于前一个索引的对比结果）---------
@@ -323,10 +324,10 @@ public class DbCompareTest {
             Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaConsColsMpr_db1, dbaConsColsMpr_db2, sheetNameDbaCons, moreConsColsMap);
 
             //输出比较数据
-            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_01);
-            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02);
-            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_03);
-            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_04);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_04, styleMap);
         }
 
 
@@ -355,10 +356,10 @@ public class DbCompareTest {
         wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urProcSheetName, null, titleUrProc, true, null, null, null, styleMap);
 
         //输出比较数据
-        Map<String, List> urProcResultMap = CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_01);
-        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02);
-        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_03);
-        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_04);
+        Map<String, List> urProcResultMap = CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_04, styleMap);
 
 
         //---------第八个Sheet页（函数、存储过程、触发器详情的对比结果）---------
@@ -392,10 +393,10 @@ public class DbCompareTest {
             Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaSourceMpr_db1, dbaSourceMpr_db2, sheetNameDbaSource, moreConsColsMap);
 
             //输出比较数据
-            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_01);
-            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02);
-            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_03);
-            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_04);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_04, styleMap);
         }
 
         ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName);
