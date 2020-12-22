@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chadi.dbcompare.dao.DbaSourceMapper">
+
+    <!--返回List-->
+    <select id="getDba_sourceByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaSource">
+		SELECT t1.OWNER, t1.NAME, t1.TYPE, t1.LINE, t1.TEXT
+        FROM Dba_source t1
+        where 1=1
+
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
+        </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.OWNER, t1.NAME, t1.TYPE, t1.LINE
+
+    </select>
+
+    <!--返回List-->
+    <select id="getDbBaseByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaSource">
+        SELECT t1.OWNER, t1.NAME, t1.TYPE, t1.LINE, t1.TEXT
+        FROM Dba_source t1
+        where 1=1
+
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
+        </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.OWNER, t1.NAME, t1.TYPE, t1.LINE
+
+    </select>
+
+</mapper>

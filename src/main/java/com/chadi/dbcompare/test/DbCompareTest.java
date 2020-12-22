@@ -9,6 +9,7 @@ import com.chadi.dbcompare.bean.UserProcedures;
 import com.chadi.dbcompare.bean.UserSource;
 import com.chadi.dbcompare.dao.DbaConsColumnsMapper;
 import com.chadi.dbcompare.dao.DbaIndColumnsMapper;
+import com.chadi.dbcompare.dao.DbaSourceMapper;
 import com.chadi.dbcompare.dao.DbaTabColsMapper;
 import com.chadi.dbcompare.dao.DbaTablesMapper;
 import com.chadi.dbcompare.dao.Mapper;
@@ -116,7 +117,7 @@ public class DbCompareTest {
     public void test_exportExcel_All_ShowTwoDB(){
 
         // 下载后文件的名称
-        String fileName = "DbTestExcel_ALL_0004.xls";
+        String fileName = "DbTestExcel_ALL_0005.xls";
         //DB名称
         List<String> dbInfoList = new ArrayList<>();
         dbInfoList.add("DB1");
@@ -324,6 +325,75 @@ public class DbCompareTest {
             //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02);
             CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_03);
             CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_04);
+        }
+
+
+
+
+
+
+
+        //---------第七个Sheet页（函数、存储过程、触发器名字对比）---------
+        //获取数据源
+        Mapper userProcMpr_db1 = CompareUtils.getDbMapper(DataSourceEnum.d1, UserProceduresMapper.class);
+        Mapper userProcMpr_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, UserProceduresMapper.class);
+
+        //获取库表的数据源
+        Map<String, List> urProcSourceMap = CompareUtils.getBsTgListAndCpCols(userProcMpr_db1, userProcMpr_db2, CompareUtils.User_Procedures, null);
+
+        //sheet名
+        String urProcSheetName = CompareUtils.User_Procedures;
+
+        // excel的标题
+        List<String> titleUrProc = (List<String>) urProcSourceMap.get(CompareUtils.compareCols);
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urProcSheetName, dbInfoList, titleUrProc, false, null, 0, null);
+
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urProcSheetName, null, titleUrProc, true, null, null, null);
+
+        //输出比较数据
+        Map<String, List> urProcResultMap = CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_01);
+        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02);
+        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_03);
+        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_04);
+
+
+        //---------第八个Sheet页（函数、存储过程、触发器详情的对比结果）---------
+        //字段比较
+        List<Map> baseUrProcMatchList = urProcResultMap.get("baseMapMatchList");
+
+        //获取数据源
+        Mapper dbaSourceMpr_db1 = CompareUtils.getDbMapper(DataSourceEnum.d1, DbaSourceMapper.class);
+        Mapper dbaSourceMpr_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, DbaSourceMapper.class);
+
+        //每次循环一个表名 匹配列
+        List<String> dbaSource_CompareCols = PropertyUtils.getPropertyToList("Dba_Source.CompareCols");
+
+        //先给页面添加列标题
+        String sheetNameDbaSource = CompareUtils.Dba_Source;
+        List<String> titleDbaSourceCols = dbaSource_CompareCols;
+
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaSource, dbInfoList, titleDbaSourceCols, false, null, 0, null);
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaSource, null, titleDbaSourceCols, true, null, null, null);
+
+        //循环匹配成功的表，比较列的匹配情况
+        for (Map baseIdxMap : baseUrProcMatchList) {
+
+            String sameName = (String) baseIdxMap.get("objectName");
+            Map moreConsColsMap = new HashMap();
+            moreConsColsMap.put("NAME", sameName);
+
+            //获取表列的数据源
+            Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaSourceMpr_db1, dbaSourceMpr_db2, sheetNameDbaSource, moreConsColsMap);
+
+            //输出比较数据
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_01);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_03);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_04);
         }
 
         ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName);
