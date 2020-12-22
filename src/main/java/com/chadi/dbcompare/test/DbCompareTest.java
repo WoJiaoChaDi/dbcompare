@@ -25,6 +25,7 @@ import com.chadi.factory.DataSourceSqlSessionFactory;
 import com.chadi.factory.MapperFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -137,13 +138,14 @@ public class DbCompareTest {
         // 建HSSFWorkbook
         // 第一步，创建一个HSSFWorkbook，对应一个Excel文件
         HSSFWorkbook wb = new HSSFWorkbook();
+        Map<String, HSSFCellStyle> styleMap = ExcelUtils.getHSSFCellStyle(wb);
 
         // excel的标题
         List<String> titleTables = (List<String>) tabSourceMap.get(CompareUtils.compareCols);
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, dbInfoList, titleTables, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, dbInfoList, titleTables, false, null, 0, null, styleMap);
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, null, titleTables, true, null, null, null, styleMap);
 
         //输出比较数据
         Map<String, List> resultMap = CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_01);
@@ -168,9 +170,9 @@ public class DbCompareTest {
         List<String> titleCols = dbaCols_CompareCols;
 
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, dbInfoList, titleCols, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameCols, dbInfoList, titleCols, false, null, 0, null, styleMap);
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameCols, null, titleCols, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameCols, null, titleCols, true, null, null, null, styleMap);
 
         //循环匹配成功的表，比较列的匹配情况
         for (Map baseTabMap : baseTabMatchList) {
@@ -209,10 +211,10 @@ public class DbCompareTest {
         // excel的标题
         List<String> titleUrIdx = (List<String>) urIdxSourceMap.get(CompareUtils.compareCols);
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urIdxsheetName, dbInfoList, titleUrIdx, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urIdxsheetName, dbInfoList, titleUrIdx, false, null, 0, null, styleMap);
 
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urIdxsheetName, null, titleUrIdx, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urIdxsheetName, null, titleUrIdx, true, null, null, null, styleMap);
 
         //输出比较数据
         Map<String, List> urIdxResultMap = CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_01);
@@ -237,9 +239,9 @@ public class DbCompareTest {
         List<String> titleDbaIndCols = dbaIndCol_CompareCols;
 
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaInd, dbInfoList, titleDbaIndCols, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaInd, dbInfoList, titleDbaIndCols, false, null, 0, null, styleMap);
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaInd, null, titleDbaIndCols, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaInd, null, titleDbaIndCols, true, null, null, null, styleMap);
 
         //循环匹配成功的表，比较列的匹配情况
         for (Map baseIdxMap : baseIdxMatchList) {
@@ -278,10 +280,10 @@ public class DbCompareTest {
         // excel的标题
         List<String> titleUrCost = (List<String>) urCostSourceMap.get(CompareUtils.compareCols);
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urCostSheetName, dbInfoList, titleUrCost, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urCostSheetName, dbInfoList, titleUrCost, false, null, 0, null, styleMap);
 
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urCostSheetName, null, titleUrCost, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urCostSheetName, null, titleUrCost, true, null, null, null, styleMap);
 
         //输出比较数据
         Map<String, List> urCostResultMap = CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_01);
@@ -306,9 +308,9 @@ public class DbCompareTest {
         List<String> titleDbaConsCols = dbaConsCol_CompareCols;
 
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaCons, dbInfoList, titleDbaConsCols, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaCons, dbInfoList, titleDbaConsCols, false, null, 0, null, styleMap);
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaCons, null, titleDbaConsCols, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaCons, null, titleDbaConsCols, true, null, null, null, styleMap);
 
         //循环匹配成功的表，比较列的匹配情况
         for (Map baseIdxMap : baseUrCostMatchList) {
@@ -347,10 +349,10 @@ public class DbCompareTest {
         // excel的标题
         List<String> titleUrProc = (List<String>) urProcSourceMap.get(CompareUtils.compareCols);
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urProcSheetName, dbInfoList, titleUrProc, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urProcSheetName, dbInfoList, titleUrProc, false, null, 0, null, styleMap);
 
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, urProcSheetName, null, titleUrProc, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urProcSheetName, null, titleUrProc, true, null, null, null, styleMap);
 
         //输出比较数据
         Map<String, List> urProcResultMap = CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_01);
@@ -375,9 +377,9 @@ public class DbCompareTest {
         List<String> titleDbaSourceCols = dbaSource_CompareCols;
 
         //DB名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaSource, dbInfoList, titleDbaSourceCols, false, null, 0, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaSource, dbInfoList, titleDbaSourceCols, false, null, 0, null, styleMap);
         //Excel列名称
-        wb = ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetNameDbaSource, null, titleDbaSourceCols, true, null, null, null);
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaSource, null, titleDbaSourceCols, true, null, null, null, styleMap);
 
         //循环匹配成功的表，比较列的匹配情况
         for (Map baseIdxMap : baseUrProcMatchList) {

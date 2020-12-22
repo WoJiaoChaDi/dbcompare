@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -104,6 +105,252 @@ public class ExcelUtils {
         } catch (Exception e) {
             log.error("导出Excel异常！" + e.getMessage(), e);
         }
+    }
+
+
+    /**
+     * @param wb         HSSFWorkbook对象
+     * @param sheetName  Sheet页名
+     * @param dbInfoList 数据库名字，只取list前两个，合并大小根据 titles长度
+     * @param titleCols  列名称
+     * @param values     值
+     * @param rowCount   如果是null，则从已有数据的下一行开始拼接。如果非null，则按具体值开始往下填充
+     * @param dataType   数据类型：1-DB1有、DB2无    2-DB1、DB2完全匹配   3-DB1、DB2部分匹配   4-DB1无、DB2有
+     * @description: 填充Excel 两列DB对比
+     * @return: org.apache.poi.hssf.usermodel.HSSFWorkbook
+     * @author: XuDong
+     * @time: 2020/12/17 17:20
+     */
+    public static HSSFWorkbook getHSSFWorkbookForDbRightWithLeftStylemap(HSSFWorkbook wb, String sheetName, List<String> dbInfoList, List<String> titleCols, boolean titlesFlag, List<Map> values, Integer rowCount, String dataType, Map<String, HSSFCellStyle> styleMap) {
+
+        // 第二步，在workbook中添加一个sheet,对应Excel文件中的sheet
+        HSSFSheet sheet = wb.getSheet(sheetName);
+        if (sheet == null) {
+            sheet = wb.createSheet(sheetName);
+        }
+        //设置Sheet的单元格的默认宽度
+        sheet.setDefaultColumnWidth(ExcelUtils.cellLength);
+
+        //如果没有传rowCount，则在已有的数据下拼接
+        if (rowCount == null) {
+            //从已有数据的下一行开始
+            rowCount = sheet.getLastRowNum() + 1;
+        }
+
+        //获取单元格样式
+        HSSFCellStyle bigTitleCellStyle = styleMap.get("bigTitleCellStyle");
+        HSSFCellStyle titleCellStyle = styleMap.get("titleCellStyle");
+        HSSFCellStyle valueCellStyle = styleMap.get("valueCellStyle");
+        HSSFCellStyle splitCellStyle = styleMap.get("splitCellStyle");
+
+        // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制
+        HSSFRow row = null;
+        HSSFCell cell = null;
+
+        // 填写大标题
+        if (!CollectionUtils.isEmpty(dbInfoList)) {
+            row = sheet.createRow(rowCount);
+
+            //合并单元格左右
+            int db1ColLeft = 0;
+            int db1ColRight = titleCols.size() - 1;
+            int db2ColLeft = titleCols.size() + 1;
+            int db2ColRight = db2ColLeft + titleCols.size() - 1;
+
+            int bitTitleRow = rowCount;
+            rowCount++;
+            cell = row.createCell(0);
+            cell.setCellValue(dbInfoList.get(0));
+            cell.setCellStyle(bigTitleCellStyle);
+            //单元格合并
+            if (db1ColLeft < db1ColRight) {
+                // 四个参数分别是：起始行，起始列，结束行，结束列
+                sheet.addMergedRegion(new CellRangeAddress(bitTitleRow, bitTitleRow, db1ColLeft, db1ColRight));
+            }
+
+            cell = row.createCell(db2ColLeft);
+            cell.setCellValue(dbInfoList.get(1));
+            cell.setCellStyle(bigTitleCellStyle);
+            //单元格合并
+            if (db2ColLeft < db2ColRight) {
+                // 四个参数分别是：起始行，起始列，结束行，结束列
+                sheet.addMergedRegion(new CellRangeAddress(bitTitleRow, bitTitleRow, db2ColLeft, db2ColRight));
+            }
+        }
+
+        if (titlesFlag) {
+            // 创建标题
+            row = sheet.createRow(rowCount);
+            rowCount++;
+
+            int cellCount = 0;
+            //DB1标题
+            for (int i = 0; i < titleCols.size(); i++) {
+                cell = row.createCell(i);
+                cell.setCellValue(titleCols.get(i));
+                cell.setCellStyle(titleCellStyle);
+                cellCount = i + 1;
+            }
+
+            cellCount += 1;
+
+            //DB2标题
+            for (int i = 0; i < titleCols.size(); i++) {
+                cell = row.createCell(cellCount + i);
+                cell.setCellValue(titleCols.get(i));
+                cell.setCellStyle(titleCellStyle);
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(values)) {
+            //迭代填写数据
+            for (int i = 0; i < values.size(); i++) {
+                row = sheet.createRow(rowCount);
+                rowCount++;
+
+                int cellCount = 0;
+
+                //列出DB1的数据(左边的数据）
+                if (!CompareUtils.dataType_04.equals(dataType)) {
+                    for (int j = 0; j < titleCols.size(); j++) {
+                        //将内容按顺序赋给对应的列对象
+                        Map valueMap = values.get(i);
+                        String title = titleCols.get(j).trim();
+
+                        HSSFCell valueCell = row.createCell(j);
+                        //去掉-号
+                        title = CompareUtils.strTrimMin(title);
+                        //去掉*号
+                        String key = CompareUtils.strToHumpAndNoStar(title);
+                        String value = (String) valueMap.get(key);
+
+                        //判断字段匹配失败，设置不同颜色
+                        if (CompareUtils.matchFlag_Yes_2.equals(valueMap.get(key + CompareUtils.keyMatchStatus))) {
+                            valueCell.setCellValue(value);
+                            valueCell.setCellStyle(valueCellStyle);
+                        } else {
+                            valueCell.setCellValue(value);
+                        }
+
+                        //如果类型是DB2不匹配，即 DB1中有，DB2中无，把左边所有填充成黄色
+                        if (CompareUtils.dataType_01.equals(dataType)) {
+                            valueCell.setCellStyle(valueCellStyle);
+                        }
+
+                        cellCount = j + 1;
+                    }
+
+                    //DB1 DB2之间的间隔列
+                    //空一格
+                    HSSFCell splitCell = row.createCell(cellCount);
+                    splitCell.setCellStyle(splitCellStyle);
+                    cellCount++;
+
+                    //如果类型是DB2不匹配，即 DB1中有，DB2中无，需要把DB2的空白填充成黄色
+                    if (CompareUtils.dataType_01.equals(dataType)) {
+                        for (int j = 0; j < titleCols.size(); j++) {
+                            HSSFCell valueCell = row.createCell(cellCount + j);
+                            valueCell.setCellValue("");
+                            valueCell.setCellStyle(valueCellStyle);
+                        }
+                    }
+
+                    //如果类型是完全匹配，DB1、DB2 完全匹配，右边列出DB2的部分
+                    if (CompareUtils.dataType_02.equals(dataType)) {
+
+                        for (int j = 0; j < titleCols.size(); j++) {
+                            //将内容按顺序赋给对应的列对象
+                            Map valueMap = values.get(i);
+                            String title = titleCols.get(j);
+
+                            HSSFCell valueCell = row.createCell(cellCount + j);
+                            //去掉-号
+                            title = CompareUtils.strTrimMin(title);
+                            //去掉*号
+                            String key = CompareUtils.strToHumpAndNoStar(title);
+                            String value = (String) valueMap.get(key);
+
+                            //判断字段匹配失败，DB2的值
+                            if (CompareUtils.matchFlag_Yes_2.equals(valueMap.get(key + CompareUtils.keyMatchStatus))) {
+                                String diffValue = (String) valueMap.get(key + CompareUtils.diffValue);
+                                valueCell.setCellValue(diffValue);
+                                valueCell.setCellStyle(valueCellStyle);
+                            } else {
+                                valueCell.setCellValue(value);
+                            }
+                        }
+                    }
+
+                    //如果类型是非完全匹配，即DB1、DB2有，但是部分不匹配，需要把DB2的数据列出来
+                    if (CompareUtils.dataType_03.equals(dataType)) {
+
+                        for (int j = 0; j < titleCols.size(); j++) {
+                            //将内容按顺序赋给对应的列对象
+                            Map valueMap = values.get(i);
+                            String title = titleCols.get(j);
+
+                            HSSFCell valueCell = row.createCell(cellCount + j);
+                            //去掉-号
+                            title = CompareUtils.strTrimMin(title);
+                            //去掉*号
+                            String key = CompareUtils.strToHumpAndNoStar(title);
+                            String value = (String) valueMap.get(key);
+
+                            //判断字段匹配失败，DB2的值
+                            if (CompareUtils.matchFlag_Yes_2.equals(valueMap.get(key + CompareUtils.keyMatchStatus))) {
+                                String diffValue = (String) valueMap.get(key + CompareUtils.diffValue);
+                                valueCell.setCellValue(diffValue);
+                                valueCell.setCellStyle(valueCellStyle);
+                            } else {
+                                valueCell.setCellValue(value);
+                            }
+
+                        }
+                    }
+
+                }
+
+                //如果类型是不匹配，即DB1中无 DB2中有，需要把DB2的数据列出来，并填充成黄色
+                if (CompareUtils.dataType_04.equals(dataType)) {
+
+                    //DB1的空白标黄
+                    for (int j = 0; j < titleCols.size(); j++) {
+                        HSSFCell valueCell = row.createCell(j);
+                        valueCell.setCellValue("");
+                        valueCell.setCellStyle(valueCellStyle);
+                        cellCount = j + 1;
+                    }
+
+                    //DB1 DB2之间的间隔列
+                    //空一格
+                    HSSFCell splitCell = row.createCell(cellCount);
+                    splitCell.setCellStyle(splitCellStyle);
+                    cellCount++;
+
+                    //DB2的值
+                    for (int j = 0; j < titleCols.size(); j++) {
+                        //将内容按顺序赋给对应的列对象
+                        Map valueMap = values.get(i);
+                        String title = titleCols.get(j);
+
+                        HSSFCell valueCell = row.createCell(cellCount + j);
+                        //去掉-号
+                        title = CompareUtils.strTrimMin(title);
+                        //去掉*号
+                        String key = CompareUtils.strToHumpAndNoStar(title);
+                        String value = (String) valueMap.get(key);
+
+                        //无需判断，直接列出DB2的值
+                        valueCell.setCellValue(value);
+                        //把DB2全部填充成黄色
+                        valueCell.setCellStyle(valueCellStyle);
+                    }
+                }
+
+
+            }
+        }
+        return wb;
     }
 
 
@@ -380,11 +627,6 @@ public class ExcelUtils {
 
             }
         }
-
-
-
-
-
         return wb;
     }
 
@@ -697,6 +939,52 @@ public class ExcelUtils {
         }
     }
 
+
+    public static Map<String, HSSFCellStyle> getHSSFCellStyle(HSSFWorkbook wb){
+
+        Map<String, HSSFCellStyle> styleMap = new HashMap<>();
+
+        //准备创建单元格样式
+        //大标题单元格样式
+        HSSFCellStyle bigTitleCellStyle = wb.createCellStyle();
+        bigTitleCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        HSSFFont fontRedBold = wb.createFont();
+        fontRedBold.setColor((short) 4);////1-透明 2-红色 3-绿色 4-蓝色 5-亮黄 6-紫色 7-青蓝 8-黑色
+        fontRedBold.setBold(true);
+        bigTitleCellStyle.setFont(fontRedBold);
+        styleMap.put("bigTitleCellStyle", bigTitleCellStyle);
+
+        //标题单元格样式
+        HSSFCellStyle titleCellStyle = wb.createCellStyle();
+        titleCellStyle.setAlignment(HorizontalAlignment.LEFT);
+        HSSFFont font = wb.createFont();
+        font.setColor(Font.COLOR_RED);
+        font.setBold(true);
+        titleCellStyle.setFont(font);
+        titleCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        titleCellStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+        styleMap.put("titleCellStyle", titleCellStyle);
+
+        //值单元格样式（突出）
+        HSSFCellStyle valueCellStyle = wb.createCellStyle();
+        HSSFFont valueFont = wb.createFont();
+        valueFont.setColor((short) 4);
+        valueFont.setBold(true);
+        valueCellStyle.setFont(font);
+        //设置背景色
+        valueCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        //valueCellStyle.setFillBackgroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+        valueCellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        styleMap.put("valueCellStyle", valueCellStyle);
+
+        //DB1、DB2之间的间隔列
+        HSSFCellStyle splitCellStyle = wb.createCellStyle();
+        splitCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        splitCellStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+        styleMap.put("splitCellStyle", splitCellStyle);
+
+        return styleMap;
+    }
 
 
 

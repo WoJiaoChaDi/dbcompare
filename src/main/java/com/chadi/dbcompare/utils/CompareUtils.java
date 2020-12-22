@@ -5,6 +5,7 @@ import com.chadi.dbcompare.dao.Mapper;
 import com.chadi.factory.DataSourceEnum;
 import com.chadi.factory.DataSourceSqlSessionFactory;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -615,7 +616,8 @@ public class CompareUtils {
         }
         List<String> titleTables = sourceMap.get(CompareUtils.compareCols);
 
-        ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, false, dataList, null, dataType);
+        Map<String, HSSFCellStyle> styleMap = ExcelUtils.getHSSFCellStyle(wb);
+        ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, null, titleTables, false, dataList, null, dataType, styleMap);
 
         return resultMap;
     }
@@ -637,7 +639,8 @@ public class CompareUtils {
         }
         List<String> titleTables = sourceMap.get(CompareUtils.compareCols);
 
-        ExcelUtils.getHSSFWorkbookForDbRightLeft(wb, sheetName, null, titleTables, false, dataList, null, dataType);
+        Map<String, HSSFCellStyle> styleMap = ExcelUtils.getHSSFCellStyle(wb);
+        ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, null, titleTables, false, dataList, null, dataType, styleMap);
 
         return resultMap;
     }
