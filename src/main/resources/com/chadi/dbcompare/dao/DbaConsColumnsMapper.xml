@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chadi.dbcompare.dao.DbaConsColumnsMapper">
+
+    <!--返回List-->
+    <select id="getDba_cons_columnsByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaConsColumns">
+		SELECT t1.OWNER, t1.CONSTRAINT_NAME, t1.TABLE_NAME, t1.COLUMN_NAME, t1.POSITION
+        FROM Dba_cons_columns t1
+        where 1=1
+
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
+        </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.OWNER, t1.CONSTRAINT_NAME, t1.TABLE_NAME, t1.COLUMN_NAME, t1.POSITION
+
+    </select>
+
+    <!--返回List-->
+    <select id="getDbBaseByPros"  parameterType="java.util.Map" resultType="com.chadi.dbcompare.bean.DbaConsColumns">
+        SELECT t1.OWNER, t1.CONSTRAINT_NAME, t1.TABLE_NAME, t1.COLUMN_NAME, t1.POSITION
+        FROM Dba_cons_columns t1
+        where 1=1
+
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
+        </foreach>
+
+        <if test="notLikeMap != null">
+            <foreach collection="notLikeMap.keys" item="key" open="and" close="" separator="and" >
+                t1.${key} not like #{notLikeMap[${key}]}
+            </foreach>
+        </if>
+
+        <if test="appendPlusList != null">
+            <foreach collection="appendPlusList" item="joinPlus" open="and" close="" separator="and">
+                t1.${joinPlus}
+            </foreach>
+        </if>
+
+        order by t1.OWNER, t1.CONSTRAINT_NAME, t1.TABLE_NAME, t1.COLUMN_NAME, t1.POSITION
+
+    </select>
+
+</mapper>

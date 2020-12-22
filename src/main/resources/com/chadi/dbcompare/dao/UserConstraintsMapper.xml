@@ -13,8 +13,8 @@
         FROM User_Constraints t1
         where 1=1
 
-        <foreach collection="params.keys" item="key" open="and" close="" separator="and" >
-            t1.${key} = #{params[${key}]}
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
         </foreach>
 
         <!-- 由于mybatis是所有sql拼接完成后，再对bind的参数赋值，所以多次foreach中notLikeMapTmp会被覆盖 -->
@@ -52,8 +52,8 @@
         FROM User_Constraints t1
         where 1=1
 
-        <foreach collection="params.keys" item="key" open="and" close="" separator="and" >
-            t1.${key} = #{params[${key}]}
+        <foreach collection="constantColMap.keys" item="key" open="and" close="" separator="and" >
+            t1.${key} = #{constantColMap[${key}]}
         </foreach>
 
         <!-- 由于mybatis是所有sql拼接完成后，再对bind的参数赋值，所以多次foreach中notLikeMapTmp会被覆盖 -->

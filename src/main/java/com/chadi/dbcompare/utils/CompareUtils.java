@@ -43,6 +43,7 @@ public class CompareUtils {
     public final static String User_indexes = "User_indexes";//索引详情
     public final static String Dba_ind_columns = "Dba_ind_columns";//索引
     public final static String User_Constraints = "User_Constraints";//约束
+    public final static String Dba_cons_columns = "Dba_cons_columns";//约束详情
     public final static String User_Procedures = "User_Procedures";//存储过程、函数、触发器
     public final static String User_Source = "User_Source";//存储过程、函数、触发器具体名
 
