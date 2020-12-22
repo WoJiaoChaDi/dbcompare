@@ -135,7 +135,7 @@ public class DbCompareTest {
         Map<String, List> tabSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabMapper_db1, dbaTabMapper_db2, CompareUtils.Dba_tables, null);
 
         //sheet名
-        String sheetName = CompareUtils.Dba_tables;
+        String sheetName = CompareUtils.Sheet_Dba_tables;
 
         // 建HSSFWorkbook
         // 第一步，创建一个HSSFWorkbook，对应一个Excel文件
@@ -168,7 +168,7 @@ public class DbCompareTest {
         List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
 
         //先给页面添加列标题
-        String sheetNameCols = CompareUtils.Dba_tab_cols;
+        String sheetNameCols = CompareUtils.Sheet_Dba_tab_cols;
         List<String> titleCols = dbaCols_CompareCols;
 
         //DB名称
@@ -184,7 +184,7 @@ public class DbCompareTest {
             moreConsColsMap.put("TABLE_NAME", sameTableName);
 
             //获取表列的数据源
-            Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabColsMpr_db1, dbaTabColsMpr_db2, sheetNameCols, moreConsColsMap);
+            Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabColsMpr_db1, dbaTabColsMpr_db2, CompareUtils.Dba_tab_cols, moreConsColsMap);
 
             //输出比较数据
             CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_01, styleMap);
@@ -208,7 +208,7 @@ public class DbCompareTest {
         Map<String, List> urIdxSourceMap = CompareUtils.getBsTgListAndCpCols(userIdxMpr_db1, userIdxMpr_db2, CompareUtils.User_indexes, null);
 
         //sheet名
-        String urIdxsheetName = CompareUtils.User_indexes;
+        String urIdxsheetName = CompareUtils.Sheet_User_indexes;
 
         // excel的标题
         List<String> titleUrIdx = (List<String>) urIdxSourceMap.get(CompareUtils.compareCols);
@@ -237,7 +237,7 @@ public class DbCompareTest {
         List<String> dbaIndCol_CompareCols = PropertyUtils.getPropertyToList("Dba_ind_columns.CompareCols");
 
         //先给页面添加列标题
-        String sheetNameDbaInd = CompareUtils.Dba_ind_columns;
+        String sheetNameDbaInd = CompareUtils.Sheet_Dba_ind_columns;
         List<String> titleDbaIndCols = dbaIndCol_CompareCols;
 
         //DB名称
@@ -253,7 +253,7 @@ public class DbCompareTest {
             moreConsColsMap.put("INDEX_NAME", sameName);
 
             //获取表列的数据源
-            Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaIndColsMpr_db1, dbaIndColsMpr_db2, sheetNameDbaInd, moreConsColsMap);
+            Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaIndColsMpr_db1, dbaIndColsMpr_db2, CompareUtils.Dba_ind_columns, moreConsColsMap);
 
             //输出比较数据
             CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_01, styleMap);
@@ -277,7 +277,7 @@ public class DbCompareTest {
         Map<String, List> urCostSourceMap = CompareUtils.getBsTgListAndCpCols(userCostMpr_db1, userCostMpr_db2, CompareUtils.User_Constraints, null);
 
         //sheet名
-        String urCostSheetName = CompareUtils.User_Constraints;
+        String urCostSheetName = CompareUtils.Sheet_User_Constraints;
 
         // excel的标题
         List<String> titleUrCost = (List<String>) urCostSourceMap.get(CompareUtils.compareCols);
@@ -306,7 +306,7 @@ public class DbCompareTest {
         List<String> dbaConsCol_CompareCols = PropertyUtils.getPropertyToList("Dba_cons_columns.CompareCols");
 
         //先给页面添加列标题
-        String sheetNameDbaCons = CompareUtils.Dba_cons_columns;
+        String sheetNameDbaCons = CompareUtils.Sheet_Dba_cons_columns;
         List<String> titleDbaConsCols = dbaConsCol_CompareCols;
 
         //DB名称
@@ -322,7 +322,7 @@ public class DbCompareTest {
             moreConsColsMap.put("CONSTRAINT_NAME", sameName);
 
             //获取表列的数据源
-            Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaConsColsMpr_db1, dbaConsColsMpr_db2, sheetNameDbaCons, moreConsColsMap);
+            Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaConsColsMpr_db1, dbaConsColsMpr_db2, CompareUtils.User_Constraints, moreConsColsMap);
 
             //输出比较数据
             CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_01, styleMap);
@@ -346,7 +346,7 @@ public class DbCompareTest {
         Map<String, List> urProcSourceMap = CompareUtils.getBsTgListAndCpCols(userProcMpr_db1, userProcMpr_db2, CompareUtils.User_Procedures, null);
 
         //sheet名
-        String urProcSheetName = CompareUtils.User_Procedures;
+        String urProcSheetName = CompareUtils.Sheet_User_Procedures;
 
         // excel的标题
         List<String> titleUrProc = (List<String>) urProcSourceMap.get(CompareUtils.compareCols);
@@ -375,7 +375,7 @@ public class DbCompareTest {
         List<String> dbaSource_CompareCols = PropertyUtils.getPropertyToList("Dba_Source.CompareCols");
 
         //先给页面添加列标题
-        String sheetNameDbaSource = CompareUtils.Dba_Source;
+        String sheetNameDbaSource = CompareUtils.Sheet_Dba_Source;
         List<String> titleDbaSourceCols = dbaSource_CompareCols;
 
         //DB名称
@@ -391,7 +391,7 @@ public class DbCompareTest {
             moreConsColsMap.put("NAME", sameName);
 
             //获取表列的数据源
-            Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaSourceMpr_db1, dbaSourceMpr_db2, sheetNameDbaSource, moreConsColsMap);
+            Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaSourceMpr_db1, dbaSourceMpr_db2, CompareUtils.User_Procedures, moreConsColsMap);
 
             //输出比较数据
             CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_01, styleMap);

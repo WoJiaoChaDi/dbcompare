@@ -76,7 +76,7 @@ public class PropertyUtils {
 
         if (StringUtils.isEmpty(property)) {
             logger.error("未获取到" + key + "属性");
-            return null;
+            return map;
         }
 
         String[] split = property.split(",");

@@ -49,6 +49,16 @@ public class CompareUtils {
     public final static String Dba_Source = "Dba_Source";//存储过程、函数、触发器具体名
     public final static String User_Source = "User_Source";//存储过程、函数、触发器具体名
 
+    public final static String Sheet_Dba_tables = "表名_Dba_tables";//表
+    public final static String Sheet_Dba_tab_cols = "表字段_Dba_tab_cols";//表字段
+    public final static String Sheet_User_indexes = "索引_User_indexes";//索引详情
+    public final static String Sheet_Dba_ind_columns = "索引详情_Dba_ind_columns";//索引
+    public final static String Sheet_User_Constraints = "约束_User_Constraints";//约束
+    public final static String Sheet_Dba_cons_columns = "约束详情_Dba_cons_columns";//约束详情
+    public final static String Sheet_User_Procedures = "函数等_User_Procedures";//存储过程、函数、触发器
+    public final static String Sheet_Dba_Source = "函数等详情_Dba_Source";//存储过程、函数、触发器具体名
+    public final static String Sheet_User_Source = "函数等详情_User_Source";//存储过程、函数、触发器具体名
+
 
 
 /**
