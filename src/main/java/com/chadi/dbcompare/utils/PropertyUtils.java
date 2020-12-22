@@ -1,6 +1,5 @@
 package com.chadi.dbcompare.utils;
 
-import net.sf.ehcache.util.PropertyUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class PropertyUtils {
-    private static final Logger logger = LoggerFactory.getLogger(PropertyUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
     private static Properties props;
     static{
         loadProps();
@@ -28,7 +27,7 @@ public class PropertyUtils {
         InputStream in = null;
         try {
 //<!--第一种，通过类加载器进行获取properties文件流-->
-                    in = PropertyUtil.class.getClassLoader().getResourceAsStream("compare.properties");
+                    in = PropertyUtils.class.getClassLoader().getResourceAsStream("compare.properties");
 //<!--第二种，通过类进行获取properties文件流-->
                     //in = PropertyUtil.class.getResourceAsStream("/jdbc.properties");
                     props.load(in);

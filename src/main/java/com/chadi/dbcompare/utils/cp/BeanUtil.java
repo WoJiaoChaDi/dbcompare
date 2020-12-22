@@ -1,7 +1,6 @@
 package com.chadi.dbcompare.utils.cp;
 
 import com.chadi.dbcompare.utils.cp.annotation.MsgNode;
-import com.github.pagehelper.util.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;

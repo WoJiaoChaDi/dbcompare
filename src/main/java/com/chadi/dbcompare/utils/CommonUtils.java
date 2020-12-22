@@ -1,6 +1,5 @@
 package com.chadi.dbcompare.utils;
 
-import net.sf.ehcache.util.PropertyUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory;
  **/
 public class CommonUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(PropertyUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
 
     /**
      * @description: 字符串去掉下划线_并变成驼峰命名

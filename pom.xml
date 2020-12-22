@@ -69,18 +69,18 @@
         </dependency>
 
         <!-- MySql驱动依赖-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>mysql</groupId>-->
+            <!--<artifactId>mysql-connector-java</artifactId>-->
+            <!--<version>5.1.6</version>-->
+        <!--</dependency>-->
 
         <!--使用ehcache-->
-        <dependency>
-            <groupId>org.mybatis.caches</groupId>
-            <artifactId>mybatis-ehcache</artifactId>
-            <version>1.1.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.mybatis.caches</groupId>-->
+            <!--<artifactId>mybatis-ehcache</artifactId>-->
+            <!--<version>1.1.0</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -177,11 +177,11 @@
         </dependency>
 
         <!-- JSP相关 -->
-        <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>jstl</groupId>-->
+            <!--<artifactId>jstl</artifactId>-->
+            <!--<version>1.2</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -202,30 +202,30 @@
         </dependency>
 
         <!--Java验证 @Email @Past @NotEmpty-->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>1.1.0.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>5.2.4.Final</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>javax.validation</groupId>-->
+            <!--<artifactId>validation-api</artifactId>-->
+            <!--<version>1.1.0.Final</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.hibernate</groupId>-->
+            <!--<artifactId>hibernate-validator</artifactId>-->
+            <!--<version>5.2.4.Final</version>-->
+        <!--</dependency>-->
 
         <!-- MyBatis的分页插件 -->
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>5.1.2-beta</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.github.pagehelper</groupId>-->
+            <!--<artifactId>pagehelper</artifactId>-->
+            <!--<version>5.1.2-beta</version>-->
+        <!--</dependency>-->
 
         <!--jsqlparser-->
-        <dependency>
-            <groupId>com.github.jsqlparser</groupId>
-            <artifactId>jsqlparser</artifactId>
-            <version>1.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.github.jsqlparser</groupId>-->
+            <!--<artifactId>jsqlparser</artifactId>-->
+            <!--<version>1.0</version>-->
+        <!--</dependency>-->
 
         <!-- log4j的依赖-->
         <dependency>
@@ -234,17 +234,17 @@
             <version>1.2.17</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.11.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.logging.log4j</groupId>-->
+            <!--<artifactId>log4j-api</artifactId>-->
+            <!--<version>2.11.1</version>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.11.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.logging.log4j</groupId>-->
+            <!--<artifactId>log4j-core</artifactId>-->
+            <!--<version>2.11.1</version>-->
+        <!--</dependency>-->
 
         <!-- 简单日志门面(Simple Logging Facade for Java),不是具体的日志解决方案,它只服务于各种各样的日志系统 -->
         <dependency>
@@ -263,36 +263,36 @@
         <!-- Jackson是一个简单基于Java应用库，Jackson可以轻松的将Java对象转换成json对象和xml文档，
         同样也可以将json、xml转换成Java对象。Jackson所依赖的jar包较少，简单易用并且性能也要相对高些，
         并且Jackson社区相对比较活跃，更新速度也比较快。-->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.6.2</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+            <!--<artifactId>jackson-databind</artifactId>-->
+            <!--<version>2.6.2</version>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.6.2</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+            <!--<artifactId>jackson-core</artifactId>-->
+            <!--<version>2.6.2</version>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.6.2</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+            <!--<artifactId>jackson-annotations</artifactId>-->
+            <!--<version>2.6.2</version>-->
+        <!--</dependency>-->
 
-        <!-- JSTL标签库相关依赖  -->
-        <dependency>
-            <groupId>org.apache.taglibs</groupId>
-            <artifactId>taglibs-standard-impl</artifactId>
-            <version>1.2.5</version>
-        </dependency>
+        <!--&lt;!&ndash; JSTL标签库相关依赖  &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.taglibs</groupId>-->
+            <!--<artifactId>taglibs-standard-impl</artifactId>-->
+            <!--<version>1.2.5</version>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.apache.taglibs</groupId>
-            <artifactId>taglibs-standard-spec</artifactId>
-            <version>1.2.5</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.taglibs</groupId>-->
+            <!--<artifactId>taglibs-standard-spec</artifactId>-->
+            <!--<version>1.2.5</version>-->
+        <!--</dependency>-->
 
         <!-- apache最早提供的日志的门面接口 -->
         <dependency>
@@ -329,12 +329,12 @@
             <version>1.16.18</version>
         </dependency>
 
-        <!--c3p0 连接池 -->
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.5.2</version>
-        </dependency>
+        <!--&lt;!&ndash;c3p0 连接池 &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>com.mchange</groupId>-->
+            <!--<artifactId>c3p0</artifactId>-->
+            <!--<version>0.9.5.2</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.oracle</groupId>
