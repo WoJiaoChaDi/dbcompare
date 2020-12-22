@@ -117,6 +117,7 @@ public class DbCompareTest {
     @Test
     public void test_exportExcel_All_ShowTwoDB(){
 
+        long startTime = System.currentTimeMillis();
 
         // 下载后文件的名称
         String fileName = "DbTestExcel_ALL_0005.xls";
@@ -400,6 +401,10 @@ public class DbCompareTest {
         }
 
         ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName);
+
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("总计耗时：" + (endTime - startTime));
     }
 
 
