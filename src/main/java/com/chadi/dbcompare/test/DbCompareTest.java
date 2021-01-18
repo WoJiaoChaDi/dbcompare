@@ -23,6 +23,7 @@ import com.chadi.dbcompare.utils.PropertyUtils;
 import com.chadi.factory.DataSourceEnum;
 import com.chadi.factory.DataSourceSqlSessionFactory;
 import com.chadi.factory.MapperFactory;
+import com.chadi.factory.SimpleDataSource;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class DbCompareTest {
 
@@ -108,6 +110,320 @@ public class DbCompareTest {
     }
 
     /**
+     * @description: 动态的DB左右对比，黄色标注不一样字段
+     * @param
+     * @return: void
+     * @author: XuDong
+     * @time: 2020/12/18 14:47
+     */
+    @Test
+    public void test_DynamicUser() throws IOException {
+        long startTime = System.currentTimeMillis();
+
+        SimpleDataSource simDataSource1 = new SimpleDataSource();
+        SimpleDataSource simDataSource2 = new SimpleDataSource();
+
+        Properties dbconfig = PropertyUtils.getPropsMap().get("dbconfig");
+        String d1 = "d1";
+        String d2 = "d2";
+        simDataSource1.setUsername(dbconfig.getProperty(d1+".orcl.username"));
+        simDataSource1.setPassword(dbconfig.getProperty(d1+".orcl.password"));
+        simDataSource1.setUrl(dbconfig.getProperty(d1+".orcl.url"));
+        simDataSource1.setDriver(dbconfig.getProperty(d1+".orcl.driver"));
+        simDataSource2.setUsername(dbconfig.getProperty(d2+".orcl.username"));
+        simDataSource2.setPassword(dbconfig.getProperty(d2+".orcl.password"));
+        simDataSource2.setUrl(dbconfig.getProperty(d2+".orcl.url"));
+        simDataSource2.setDriver(dbconfig.getProperty(d2+".orcl.driver"));
+
+        // 下载后文件的名称
+        String fileName = "DbTestExcel_ALL_0010_Dynamic.xls";
+        //DB名称
+        List<String> dbInfoList = new ArrayList<>();
+        dbInfoList.add("DB1");
+        dbInfoList.add("DB2");
+
+        //---------第一个Sheet页（表名对比）---------
+        //获取数据源
+        Mapper dbaTabMapper_db1 = CompareUtils.getDbDynamicMapper(DbaTablesMapper.class, simDataSource1);
+        Mapper dbaTabMapper_db2 = CompareUtils.getDbDynamicMapper(DbaTablesMapper.class, simDataSource2);
+
+        //获取库表的数据源
+        Map<String, List> tabSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabMapper_db1, dbaTabMapper_db2, CompareUtils.Dba_tables, null);
+
+        //sheet名
+        String sheetName = CompareUtils.Sheet_Dba_tables;
+
+        // 建HSSFWorkbook
+        // 第一步，创建一个HSSFWorkbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+        Map<String, HSSFCellStyle> styleMap = ExcelUtils.getHSSFCellStyle(wb);
+
+        // excel的标题
+        List<String> titleTables = (List<String>) tabSourceMap.get(CompareUtils.compareCols);
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, dbInfoList, titleTables, false, null, 0, null, styleMap);
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetName, null, titleTables, true, null, null, null, styleMap);
+
+        //输出比较数据
+        Map<String, List> resultMap = CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(tabSourceMap, wb, sheetName, CompareUtils.dataType_04, styleMap);
+
+
+        //---------第二个Sheet页（列名对比：基于前一个表的对比结果）---------
+        //字段比较
+        List<Map> baseTabMatchList = resultMap.get("baseMapMatchList");
+
+        //获取数据源
+        Mapper dbaTabColsMpr_db1 = CompareUtils.getDbDynamicMapper(DbaTabColsMapper.class, simDataSource1);
+        Mapper dbaTabColsMpr_db2 = CompareUtils.getDbDynamicMapper(DbaTabColsMapper.class, simDataSource2);
+
+        //每次循环一个表名 匹配列
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.CompareCols");
+
+        //先给页面添加列标题
+        String sheetNameCols = CompareUtils.Sheet_Dba_tab_cols;
+        List<String> titleCols = dbaCols_CompareCols;
+
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameCols, dbInfoList, titleCols, false, null, 0, null, styleMap);
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameCols, null, titleCols, true, null, null, null, styleMap);
+
+        //循环匹配成功的表，比较列的匹配情况
+        for (Map baseTabMap : baseTabMatchList) {
+
+            String sameTableName = (String) baseTabMap.get("tableName");
+            Map moreConsColsMap = new HashMap();
+            moreConsColsMap.put("TABLE_NAME", sameTableName);
+
+            //获取表列的数据源
+            Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabColsMpr_db1, dbaTabColsMpr_db2, CompareUtils.Dba_tab_cols, moreConsColsMap);
+
+            //输出比较数据
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameCols, CompareUtils.dataType_04, styleMap);
+        }
+
+
+
+
+
+
+
+        //---------第三个Sheet页（索引对比）---------
+        //获取数据源
+        Mapper userIdxMpr_db1 = CompareUtils.getDbDynamicMapper(UserIndexesMapper.class, simDataSource1);
+        Mapper userIdxMpr_db2 = CompareUtils.getDbDynamicMapper(UserIndexesMapper.class, simDataSource2);
+
+        //获取库表的数据源
+        Map<String, List> urIdxSourceMap = CompareUtils.getBsTgListAndCpCols(userIdxMpr_db1, userIdxMpr_db2, CompareUtils.User_indexes, null);
+
+        //sheet名
+        String urIdxsheetName = CompareUtils.Sheet_User_indexes;
+
+        // excel的标题
+        List<String> titleUrIdx = (List<String>) urIdxSourceMap.get(CompareUtils.compareCols);
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urIdxsheetName, dbInfoList, titleUrIdx, false, null, 0, null, styleMap);
+
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urIdxsheetName, null, titleUrIdx, true, null, null, null, styleMap);
+
+        //输出比较数据
+        Map<String, List> urIdxResultMap = CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_04, styleMap);
+
+
+        //---------第四个Sheet页（索引详情对比:基于前一个索引的对比结果）---------
+        //字段比较
+        List<Map> baseIdxMatchList = urIdxResultMap.get("baseMapMatchList");
+
+        //获取数据源
+        Mapper dbaIndColsMpr_db1 = CompareUtils.getDbDynamicMapper(DbaIndColumnsMapper.class, simDataSource1);
+        Mapper dbaIndColsMpr_db2 = CompareUtils.getDbDynamicMapper(DbaIndColumnsMapper.class, simDataSource2);
+
+        //每次循环一个表名 匹配列
+        List<String> dbaIndCol_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_ind_columns.CompareCols");
+
+        //先给页面添加列标题
+        String sheetNameDbaInd = CompareUtils.Sheet_Dba_ind_columns;
+        List<String> titleDbaIndCols = dbaIndCol_CompareCols;
+
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaInd, dbInfoList, titleDbaIndCols, false, null, 0, null, styleMap);
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaInd, null, titleDbaIndCols, true, null, null, null, styleMap);
+
+        //循环匹配成功的表，比较列的匹配情况
+        for (Map baseIdxMap : baseIdxMatchList) {
+
+            String sameName = (String) baseIdxMap.get("indexName");
+            Map moreConsColsMap = new HashMap();
+            moreConsColsMap.put("INDEX_NAME", sameName);
+
+            //获取表列的数据源
+            Map<String, List> colsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaIndColsMpr_db1, dbaIndColsMpr_db2, CompareUtils.Dba_ind_columns, moreConsColsMap);
+
+            //输出比较数据
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_04, styleMap);
+        }
+
+
+
+
+
+
+
+        //---------第五个Sheet页（约束对比）---------
+        //获取数据源
+        Mapper userCostMpr_db1 = CompareUtils.getDbDynamicMapper(UserConstraintsMapper.class, simDataSource1);
+        Mapper userCostMpr_db2 = CompareUtils.getDbDynamicMapper(UserConstraintsMapper.class, simDataSource2);
+
+        //获取库表的数据源
+        Map<String, List> urCostSourceMap = CompareUtils.getBsTgListAndCpCols(userCostMpr_db1, userCostMpr_db2, CompareUtils.User_Constraints, null);
+
+        //sheet名
+        String urCostSheetName = CompareUtils.Sheet_User_Constraints;
+
+        // excel的标题
+        List<String> titleUrCost = (List<String>) urCostSourceMap.get(CompareUtils.compareCols);
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urCostSheetName, dbInfoList, titleUrCost, false, null, 0, null, styleMap);
+
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urCostSheetName, null, titleUrCost, true, null, null, null, styleMap);
+
+        //输出比较数据
+        Map<String, List> urCostResultMap = CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(urCostSourceMap, wb, urCostSheetName, CompareUtils.dataType_04, styleMap);
+
+
+        //---------第六个Sheet页（约束详情对比:基于前一个索引的对比结果）---------
+        //字段比较
+        List<Map> baseUrCostMatchList = urCostResultMap.get("baseMapMatchList");
+
+        //获取数据源
+        Mapper dbaConsColsMpr_db1 = CompareUtils.getDbDynamicMapper(DbaConsColumnsMapper.class, simDataSource1);
+        Mapper dbaConsColsMpr_db2 = CompareUtils.getDbDynamicMapper(DbaConsColumnsMapper.class, simDataSource2);
+
+        //每次循环一个表名 匹配列
+        List<String> dbaConsCol_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_cons_columns.CompareCols");
+
+        //先给页面添加列标题
+        String sheetNameDbaCons = CompareUtils.Sheet_Dba_cons_columns;
+        List<String> titleDbaConsCols = dbaConsCol_CompareCols;
+
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaCons, dbInfoList, titleDbaConsCols, false, null, 0, null, styleMap);
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaCons, null, titleDbaConsCols, true, null, null, null, styleMap);
+
+        //循环匹配成功的表，比较列的匹配情况
+        for (Map baseIdxMap : baseUrCostMatchList) {
+
+            String sameName = (String) baseIdxMap.get("constraintName");
+            Map moreConsColsMap = new HashMap();
+            moreConsColsMap.put("CONSTRAINT_NAME", sameName);
+
+            //获取表列的数据源
+            Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaConsColsMpr_db1, dbaConsColsMpr_db2, CompareUtils.User_Constraints, moreConsColsMap);
+
+            //输出比较数据
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaCons, CompareUtils.dataType_04, styleMap);
+        }
+
+
+
+
+
+
+
+        //---------第七个Sheet页（函数、存储过程、触发器名字对比）---------
+        //获取数据源
+        Mapper userProcMpr_db1 = CompareUtils.getDbDynamicMapper(UserProceduresMapper.class, simDataSource1);
+        Mapper userProcMpr_db2 = CompareUtils.getDbDynamicMapper(UserProceduresMapper.class, simDataSource2);
+
+        //获取库表的数据源
+        Map<String, List> urProcSourceMap = CompareUtils.getBsTgListAndCpCols(userProcMpr_db1, userProcMpr_db2, CompareUtils.User_Procedures, null);
+
+        //sheet名
+        String urProcSheetName = CompareUtils.Sheet_User_Procedures;
+
+        // excel的标题
+        List<String> titleUrProc = (List<String>) urProcSourceMap.get(CompareUtils.compareCols);
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urProcSheetName, dbInfoList, titleUrProc, false, null, 0, null, styleMap);
+
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, urProcSheetName, null, titleUrProc, true, null, null, null, styleMap);
+
+        //输出比较数据
+        Map<String, List> urProcResultMap = CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_01, styleMap);
+        //CompareUtils.writeDataToWbByType(urIdxSourceMap, wb, urIdxsheetName, CompareUtils.dataType_02, styleMap);
+        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_03, styleMap);
+        CompareUtils.writeDataToWbByType(urProcSourceMap, wb, urProcSheetName, CompareUtils.dataType_04, styleMap);
+
+
+        //---------第八个Sheet页（函数、存储过程、触发器详情的对比结果）---------
+        //字段比较
+        List<Map> baseUrProcMatchList = urProcResultMap.get("baseMapMatchList");
+
+        //获取数据源
+        Mapper dbaSourceMpr_db1 = CompareUtils.getDbDynamicMapper(DbaSourceMapper.class, simDataSource1);
+        Mapper dbaSourceMpr_db2 = CompareUtils.getDbDynamicMapper(DbaSourceMapper.class, simDataSource2);
+
+        //每次循环一个表名 匹配列
+        List<String> dbaSource_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_Source.CompareCols");
+
+        //先给页面添加列标题
+        String sheetNameDbaSource = CompareUtils.Sheet_Dba_Source;
+        List<String> titleDbaSourceCols = dbaSource_CompareCols;
+
+        //DB名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaSource, dbInfoList, titleDbaSourceCols, false, null, 0, null, styleMap);
+        //Excel列名称
+        wb = ExcelUtils.getHSSFWorkbookForDbRightWithLeftStylemap(wb, sheetNameDbaSource, null, titleDbaSourceCols, true, null, null, null, styleMap);
+
+        //循环匹配成功的表，比较列的匹配情况
+        for (Map baseIdxMap : baseUrProcMatchList) {
+
+            String sameName = (String) baseIdxMap.get("objectName");
+            Map moreConsColsMap = new HashMap();
+            moreConsColsMap.put("NAME", sameName);
+
+            //获取表列的数据源
+            Map<String, List> dbaConsColsSourceMap = CompareUtils.getBsTgListAndCpCols(dbaSourceMpr_db1, dbaSourceMpr_db2, CompareUtils.User_Procedures, moreConsColsMap);
+
+            //输出比较数据
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_01, styleMap);
+            //CompareUtils.writeDataToWbByTypeLine(colsSourceMap, wb, sheetNameDbaInd, CompareUtils.dataType_02, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_03, styleMap);
+            CompareUtils.writeDataToWbByTypeLine(dbaConsColsSourceMap, wb, sheetNameDbaSource, CompareUtils.dataType_04, styleMap);
+        }
+
+        ExcelUtils.exportExcelToDesk(wb, "d:\\" +fileName);
+
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("总计耗时：" + (endTime - startTime));
+    }
+
+    /**
      * @description: 双DB左右对比，黄色标注不一样字段
      * @param
      * @return: void
@@ -165,7 +481,7 @@ public class DbCompareTest {
         Mapper dbaTabColsMpr_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
 
         //每次循环一个表名 匹配列
-        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.CompareCols");
 
         //先给页面添加列标题
         String sheetNameCols = CompareUtils.Sheet_Dba_tab_cols;
@@ -234,7 +550,7 @@ public class DbCompareTest {
         Mapper dbaIndColsMpr_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, DbaIndColumnsMapper.class);
 
         //每次循环一个表名 匹配列
-        List<String> dbaIndCol_CompareCols = PropertyUtils.getPropertyToList("Dba_ind_columns.CompareCols");
+        List<String> dbaIndCol_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_ind_columns.CompareCols");
 
         //先给页面添加列标题
         String sheetNameDbaInd = CompareUtils.Sheet_Dba_ind_columns;
@@ -303,7 +619,7 @@ public class DbCompareTest {
         Mapper dbaConsColsMpr_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, DbaConsColumnsMapper.class);
 
         //每次循环一个表名 匹配列
-        List<String> dbaConsCol_CompareCols = PropertyUtils.getPropertyToList("Dba_cons_columns.CompareCols");
+        List<String> dbaConsCol_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_cons_columns.CompareCols");
 
         //先给页面添加列标题
         String sheetNameDbaCons = CompareUtils.Sheet_Dba_cons_columns;
@@ -372,7 +688,7 @@ public class DbCompareTest {
         Mapper dbaSourceMpr_db2 = CompareUtils.getDbMapper(DataSourceEnum.d2, DbaSourceMapper.class);
 
         //每次循环一个表名 匹配列
-        List<String> dbaSource_CompareCols = PropertyUtils.getPropertyToList("Dba_Source.CompareCols");
+        List<String> dbaSource_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_Source.CompareCols");
 
         //先给页面添加列标题
         String sheetNameDbaSource = CompareUtils.Sheet_Dba_Source;
@@ -426,11 +742,11 @@ public class DbCompareTest {
         dbInfoList.add("DB1");
         dbInfoList.add("DB2");
 
-        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
-        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
-        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
-        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
-        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.CompareCols");
+        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.ConsCols_1");
+        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.ConsCols_2");
+        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.NotLikeMap");
+        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("compare", "Dba_tables.AppendPlus");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tables.CompareCols");
 
 
         List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
@@ -474,13 +790,13 @@ public class DbCompareTest {
         DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
         DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
 
-        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
-        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
-        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
-        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
+        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.ConsCols_1");
+        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.ConsCols_2");
+        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.NotLikeMap");
+        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.AppendPlus");
 
         //每次循环一个表名 匹配列
-        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.CompareCols");
 
         //先给页面添加列标题
         String sheetNameCols = "Dba_tab_cols";
@@ -533,11 +849,11 @@ public class DbCompareTest {
         DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
         DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTablesMapper.class);
 
-        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
-        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
-        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
-        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
-        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.CompareCols");
+        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.ConsCols_1");
+        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.ConsCols_2");
+        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.NotLikeMap");
+        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("compare", "Dba_tables.AppendPlus");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tables.CompareCols");
 
 
         List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
@@ -585,13 +901,13 @@ public class DbCompareTest {
         DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
         DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
 
-        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
-        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
-        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
-        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
+        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.ConsCols_1");
+        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.ConsCols_2");
+        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.NotLikeMap");
+        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.AppendPlus");
 
         //每次循环一个表名 匹配列
-        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
+        List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.CompareCols");
         for (Map baseMapMatch : baseMapMatchList) {
 
             String sameTableName = (String) baseMapMatch.get("tableName");
@@ -638,11 +954,11 @@ public class DbCompareTest {
         UserProceduresMapper uPrecedure_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserProceduresMapper.class);
         UserProceduresMapper uPrecedure_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, UserProceduresMapper.class);
 
-        Map uPrecedure_BaseMap = PropertyUtils.getPropertyToMap("User_Procedures.ConsCols_1");
-        Map uPrecedure_CompareMap = PropertyUtils.getPropertyToMap("User_Procedures.ConsCols_2");
-        Map uPrecedure_NotLike = PropertyUtils.getPropertyToMap("User_Procedures.NotLikeMap");
-        List<String> uPrecedure_AppendPlusList = PropertyUtils.getPropertyToList("User_Procedures.AppendPlus");
-        List<String> uPrecedure_CompareCols = PropertyUtils.getPropertyToList("User_Procedures.CompareCols");
+        Map uPrecedure_BaseMap = PropertyUtils.getPropertyToMap("compare", "User_Procedures.ConsCols_1");
+        Map uPrecedure_CompareMap = PropertyUtils.getPropertyToMap("compare", "User_Procedures.ConsCols_2");
+        Map uPrecedure_NotLike = PropertyUtils.getPropertyToMap("compare", "User_Procedures.NotLikeMap");
+        List<String> uPrecedure_AppendPlusList = PropertyUtils.getPropertyToList("compare", "User_Procedures.AppendPlus");
+        List<String> uPrecedure_CompareCols = PropertyUtils.getPropertyToList("compare", "User_Procedures.CompareCols");
 
         List<UserProcedures> uPrecedure_BaseList = uPrecedure_db1.getUser_proceduresByPros(uPrecedure_BaseMap, uPrecedure_NotLike, uPrecedure_AppendPlusList);
         List<UserProcedures> uPrecedure_TargetList = uPrecedure_db2.getUser_proceduresByPros(uPrecedure_CompareMap, uPrecedure_NotLike, uPrecedure_AppendPlusList);
@@ -663,7 +979,7 @@ public class DbCompareTest {
         //每次循环一个表名 匹配列
         for (Map baseMapMatch : baseMapMatchList) {
 
-            List<String> uSource_CompareCols = PropertyUtils.getPropertyToList("User_Source.CompareCols");
+            List<String> uSource_CompareCols = PropertyUtils.getPropertyToList("compare", "User_Source.CompareCols");
             String objectName = (String) baseMapMatch.get("objectName");
             String objectType = (String) baseMapMatch.get("objectType");
 
@@ -694,11 +1010,11 @@ public class DbCompareTest {
     public void test_Constraints() throws IOException, IllegalAccessException {
         UserConstraintsMapper uConstr_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserConstraintsMapper.class);
         UserConstraintsMapper uConstr_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, UserConstraintsMapper.class);
-        Map uConstr_BaseMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_1");
-        Map uConstr_CompareMap = PropertyUtils.getPropertyToMap("User_Constraints.ConsCols_2");
-        Map uConstr_NotLike = PropertyUtils.getPropertyToMap("User_Constraints.NotLikeMap");
-        List<String> uConstr_AppendPlusList = PropertyUtils.getPropertyToList("User_Constraints.AppendPlus");
-        List<String> uConstr_CompareCols = PropertyUtils.getPropertyToList("User_Constraints.CompareCols");
+        Map uConstr_BaseMap = PropertyUtils.getPropertyToMap("compare", "User_Constraints.ConsCols_1");
+        Map uConstr_CompareMap = PropertyUtils.getPropertyToMap("compare", "User_Constraints.ConsCols_2");
+        Map uConstr_NotLike = PropertyUtils.getPropertyToMap("compare", "User_Constraints.NotLikeMap");
+        List<String> uConstr_AppendPlusList = PropertyUtils.getPropertyToList("compare", "User_Constraints.AppendPlus");
+        List<String> uConstr_CompareCols = PropertyUtils.getPropertyToList("compare", "User_Constraints.CompareCols");
 
         List<UserConstraints> uConstr_BaseList = uConstr_db1.getUser_ConstraintsByPros(uConstr_BaseMap, uConstr_NotLike, uConstr_AppendPlusList);
         List<UserConstraints> uConstr_TargetList = uConstr_db2.getUser_ConstraintsByPros(uConstr_CompareMap, uConstr_NotLike, uConstr_AppendPlusList);
@@ -722,11 +1038,11 @@ public class DbCompareTest {
     public void test_Indexs() throws IOException, IllegalAccessException {
         DbaIndColumnsMapper dbaIndex_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaIndColumnsMapper.class);
         DbaIndColumnsMapper dbaIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaIndColumnsMapper.class);
-        Map dbaIndex_BaseMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_1");
-        Map dbaIndex_CompareMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.ConsCols_2");
-        Map dbaIndex_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_ind_columns.NotLikeMap");
-        List<String> dbaIndex_AppendPlusList = PropertyUtils.getPropertyToList("Dba_ind_columns.AppendPlus");
-        List<String> dbaIndex_CompareCols = PropertyUtils.getPropertyToList("Dba_ind_columns.CompareCols");
+        Map dbaIndex_BaseMap = PropertyUtils.getPropertyToMap("compare", "Dba_ind_columns.ConsCols_1");
+        Map dbaIndex_CompareMap = PropertyUtils.getPropertyToMap("compare", "Dba_ind_columns.ConsCols_2");
+        Map dbaIndex_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "Dba_ind_columns.NotLikeMap");
+        List<String> dbaIndex_AppendPlusList = PropertyUtils.getPropertyToList("compare", "Dba_ind_columns.AppendPlus");
+        List<String> dbaIndex_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_ind_columns.CompareCols");
 
         List<DbaIndColumns> dbaIndex_BaseList = dbaIndex_db1.getDba_ind_columnsByPros(dbaIndex_BaseMap, dbaIndex_NotLikeMap, dbaIndex_AppendPlusList);
         List<DbaIndColumns> dbaIndex_TargetList = dbaIndex_db2.getDba_ind_columnsByPros(dbaIndex_CompareMap, dbaIndex_NotLikeMap, dbaIndex_AppendPlusList);
@@ -742,12 +1058,12 @@ public class DbCompareTest {
 
         UserIndexesMapper uIndex_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, UserIndexesMapper.class);
         UserIndexesMapper uIndex_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, UserIndexesMapper.class);
-        Map uIndex_BaseMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_1");
-        Map uIndex_CompareMap = PropertyUtils.getPropertyToMap("User_indexes.ConsCols_2");
-        Map uIndex_NotLikeMap = PropertyUtils.getPropertyToMap("User_indexes.NotLikeMap");
-        List<String> uIndex_AppendPlusList = PropertyUtils.getPropertyToList("User_indexes.AppendPlus");
+        Map uIndex_BaseMap = PropertyUtils.getPropertyToMap("compare", "User_indexes.ConsCols_1");
+        Map uIndex_CompareMap = PropertyUtils.getPropertyToMap("compare", "User_indexes.ConsCols_2");
+        Map uIndex_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "User_indexes.NotLikeMap");
+        List<String> uIndex_AppendPlusList = PropertyUtils.getPropertyToList("compare", "User_indexes.AppendPlus");
 
-        List<String> uIndex_CompareCols = PropertyUtils.getPropertyToList("User_indexes.CompareCols");
+        List<String> uIndex_CompareCols = PropertyUtils.getPropertyToList("compare", "User_indexes.CompareCols");
         List<UserIndexes> uIndex_BaseList = uIndex_db1.getUser_indexesByPros(uIndex_BaseMap, uIndex_NotLikeMap, uIndex_AppendPlusList);
         List<UserIndexes> uIndex_TargetList = uIndex_db2.getUser_indexesByPros(uIndex_CompareMap, uIndex_NotLikeMap, uIndex_AppendPlusList);
 
@@ -776,11 +1092,11 @@ public class DbCompareTest {
         DbaTablesMapper dbaTables_db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTablesMapper.class);
         DbaTablesMapper dbaTables_db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTablesMapper.class);
 
-        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
-        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_2");
-        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tables.NotLikeMap");
-        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tables.AppendPlus");
-        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("Dba_tables.CompareCols");
+        Map dbaTables_BaseMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.ConsCols_1");
+        Map dbaTables_CompareMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.ConsCols_2");
+        Map dbaTables_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "Dba_tables.NotLikeMap");
+        List<String> dbaTables_AppendPlusList = PropertyUtils.getPropertyToList("compare", "Dba_tables.AppendPlus");
+        List<String> dbaTables_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tables.CompareCols");
 
 
         List<DbaTables> dbaTables_BaseList = dbaTables_db1.getDba_tablesByPros(dbaTables_BaseMap, dbaTables_NotLikeMap, dbaTables_AppendPlusList);
@@ -798,10 +1114,10 @@ public class DbCompareTest {
         DbaTabColsMapper dbaCols_Db1 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d1, DbaTabColsMapper.class);
         DbaTabColsMapper dbaCols_Db2 = DataSourceSqlSessionFactory.getTypeMapper(DataSourceEnum.d2, DbaTabColsMapper.class);
 
-        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_1");
-        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.ConsCols_2");
-        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("Dba_tab_cols.NotLikeMap");
-        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("Dba_tab_cols.AppendPlus");
+        Map dbaCols_BaseMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.ConsCols_1");
+        Map dbaCols_CompareMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.ConsCols_2");
+        Map dbaCols_NotLikeMap = PropertyUtils.getPropertyToMap("compare", "Dba_tab_cols.NotLikeMap");
+        List<String> dbaCols_AppendPlusList = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.AppendPlus");
 
         //每次循环一个表名 匹配列
         for (Map baseMapMatch : baseMapMatchList) {
@@ -810,7 +1126,7 @@ public class DbCompareTest {
             dbaCols_BaseMap.put("TABLE_NAME", sameTableName);
             dbaCols_CompareMap.put("TABLE_NAME", sameTableName);
 
-            List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("Dba_tab_cols.CompareCols");
+            List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("compare", "Dba_tab_cols.CompareCols");
 
             List<DbaTabCols> dbaCols_BaseList = dbaCols_Db1.getDba_tab_colsByPros(dbaCols_BaseMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
             List<DbaTabCols> dbaCols_TargetList = dbaCols_Db2.getDba_tab_colsByPros(dbaCols_CompareMap, dbaCols_NotLikeMap, dbaCols_AppendPlusList);
@@ -882,7 +1198,7 @@ public class DbCompareTest {
 		//List<DbaTables> dba_tablesList = mapper.getDba_tablesByOwner("HEAD");
 
 		//通过配置查询
-		Map map = PropertyUtils.getPropertyToMap("Dba_tables.ConsCols_1");
+		Map map = PropertyUtils.getPropertyToMap("compare", "Dba_tables.ConsCols_1");
 		List<DbaTables> dba_tablesList = mapper.getDba_tablesByPros(map, null, null);
 
 		logger.info(""+dba_tablesList.size());

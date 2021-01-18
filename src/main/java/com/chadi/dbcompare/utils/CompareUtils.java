@@ -3,7 +3,9 @@ package com.chadi.dbcompare.utils;
 import com.chadi.dbcompare.bean.DbBaseObj;
 import com.chadi.dbcompare.dao.Mapper;
 import com.chadi.factory.DataSourceEnum;
+import com.chadi.factory.DataSourceSqlDynamicSessionFactory;
 import com.chadi.factory.DataSourceSqlSessionFactory;
+import com.chadi.factory.SimpleDataSource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -580,16 +582,20 @@ public class CompareUtils {
         }
     }
 
+    public static Mapper getDbDynamicMapper(Class<? extends Mapper> mapperClass, SimpleDataSource simpleDataSource){
+        return DataSourceSqlDynamicSessionFactory.getTypeMapper(DataSourceEnum.d1, mapperClass, simpleDataSource);
+    }
+
     public static Mapper getDbMapper(DataSourceEnum d, Class<? extends Mapper> mapperClass){
         return DataSourceSqlSessionFactory.getTypeMapper(d, mapperClass);
     }
 
     public static Map<String, List> getBsTgListAndCpCols(Mapper mapper_db1, Mapper mapper_db2, String typeStr, Map moreConsColsMap){
 
-        Map baseMap = PropertyUtils.getPropertyToMap(typeStr + ".ConsCols_1");
-        Map compareMap = PropertyUtils.getPropertyToMap(typeStr + ".ConsCols_2");
-        Map notLikeMap = PropertyUtils.getPropertyToMap(typeStr + ".NotLikeMap");
-        List<String> appendPlusList = PropertyUtils.getPropertyToList(typeStr + ".AppendPlus");
+        Map baseMap = PropertyUtils.getPropertyToMap("compare", typeStr + ".ConsCols_1");
+        Map compareMap = PropertyUtils.getPropertyToMap("compare", typeStr + ".ConsCols_2");
+        Map notLikeMap = PropertyUtils.getPropertyToMap("compare", typeStr + ".NotLikeMap");
+        List<String> appendPlusList = PropertyUtils.getPropertyToList("compare", typeStr + ".AppendPlus");
 
         //添加额外的条件
         if (moreConsColsMap != null) {
@@ -599,7 +605,7 @@ public class CompareUtils {
 
         List<DbBaseObj> baseList = mapper_db1.getDbBaseByPros(baseMap, notLikeMap, appendPlusList);
         List<DbBaseObj> targetList = mapper_db2.getDbBaseByPros(compareMap, notLikeMap, appendPlusList);
-        List<String> compareCols = PropertyUtils.getPropertyToList(typeStr + ".CompareCols");
+        List<String> compareCols = PropertyUtils.getPropertyToList("compare", typeStr + ".CompareCols");
 
         Map<String, List> sourceMap = new HashMap();
         sourceMap.put(CompareUtils.baseList, baseList);
