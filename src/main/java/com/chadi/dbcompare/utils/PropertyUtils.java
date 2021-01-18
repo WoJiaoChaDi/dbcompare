@@ -23,7 +23,7 @@ public class PropertyUtils {
 
     synchronized static private void loadProps(){
         logger.info("开始加载properties文件内容.......");
-        List<String> propList = Arrays.asList("compare", "dbconfig");
+        List<String> propList = Arrays.asList("dbcompare", "dbconfig");
         for (String propName : propList) {
             Properties props = new Properties();
             InputStream in = null;

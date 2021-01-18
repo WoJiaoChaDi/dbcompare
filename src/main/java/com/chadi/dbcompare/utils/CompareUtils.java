@@ -592,10 +592,10 @@ public class CompareUtils {
 
     public static Map<String, List> getBsTgListAndCpCols(Mapper mapper_db1, Mapper mapper_db2, String typeStr, Map moreConsColsMap){
 
-        Map baseMap = PropertyUtils.getPropertyToMap("compare", typeStr + ".ConsCols_1");
-        Map compareMap = PropertyUtils.getPropertyToMap("compare", typeStr + ".ConsCols_2");
-        Map notLikeMap = PropertyUtils.getPropertyToMap("compare", typeStr + ".NotLikeMap");
-        List<String> appendPlusList = PropertyUtils.getPropertyToList("compare", typeStr + ".AppendPlus");
+        Map baseMap = PropertyUtils.getPropertyToMap("dbcompare", typeStr + ".ConsCols_1");
+        Map compareMap = PropertyUtils.getPropertyToMap("dbcompare", typeStr + ".ConsCols_2");
+        Map notLikeMap = PropertyUtils.getPropertyToMap("dbcompare", typeStr + ".NotLikeMap");
+        List<String> appendPlusList = PropertyUtils.getPropertyToList("dbcompare", typeStr + ".AppendPlus");
 
         //添加额外的条件
         if (moreConsColsMap != null) {
@@ -605,7 +605,7 @@ public class CompareUtils {
 
         List<DbBaseObj> baseList = mapper_db1.getDbBaseByPros(baseMap, notLikeMap, appendPlusList);
         List<DbBaseObj> targetList = mapper_db2.getDbBaseByPros(compareMap, notLikeMap, appendPlusList);
-        List<String> compareCols = PropertyUtils.getPropertyToList("compare", typeStr + ".CompareCols");
+        List<String> compareCols = PropertyUtils.getPropertyToList("dbcompare", typeStr + ".CompareCols");
 
         Map<String, List> sourceMap = new HashMap();
         sourceMap.put(CompareUtils.baseList, baseList);
