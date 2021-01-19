@@ -582,8 +582,8 @@ public class CompareUtils {
         }
     }
 
-    public static Mapper getDbDynamicMapper(Class<? extends Mapper> mapperClass, SimpleDataSource simpleDataSource){
-        return DataSourceSqlDynamicSessionFactory.getTypeMapper(DataSourceEnum.d1, mapperClass, simpleDataSource);
+    public static Mapper getDbDynamicMapper(DataSourceEnum d, Class<? extends Mapper> mapperClass, SimpleDataSource simpleDataSource){
+        return DataSourceSqlDynamicSessionFactory.getTypeMapper(d, mapperClass, simpleDataSource);
     }
 
     public static Mapper getDbMapper(DataSourceEnum d, Class<? extends Mapper> mapperClass){

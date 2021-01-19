@@ -136,7 +136,7 @@ public class DbCompareTest {
         simDataSource2.setDriver(dbconfig.getProperty(d2+".orcl.driver"));
 
         // 下载后文件的名称
-        String fileName = "DbTestExcel_ALL_0011_Dynamic.xls";
+        String fileName = "DbTestExcel_ALL_0012_Dynamic.xls";
         //DB名称
         List<String> dbInfoList = new ArrayList<>();
         dbInfoList.add("DB1");
@@ -144,8 +144,8 @@ public class DbCompareTest {
 
         //---------第一个Sheet页（表名对比）---------
         //获取数据源
-        Mapper dbaTabMapper_db1 = CompareUtils.getDbDynamicMapper(DbaTablesMapper.class, simDataSource1);
-        Mapper dbaTabMapper_db2 = CompareUtils.getDbDynamicMapper(DbaTablesMapper.class, simDataSource2);
+        Mapper dbaTabMapper_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, DbaTablesMapper.class, simDataSource1);
+        Mapper dbaTabMapper_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, DbaTablesMapper.class, simDataSource2);
 
         //获取库表的数据源
         Map<String, List> tabSourceMap = CompareUtils.getBsTgListAndCpCols(dbaTabMapper_db1, dbaTabMapper_db2, CompareUtils.Dba_tables, null);
@@ -177,8 +177,8 @@ public class DbCompareTest {
         List<Map> baseTabMatchList = resultMap.get("baseMapMatchList");
 
         //获取数据源
-        Mapper dbaTabColsMpr_db1 = CompareUtils.getDbDynamicMapper(DbaTabColsMapper.class, simDataSource1);
-        Mapper dbaTabColsMpr_db2 = CompareUtils.getDbDynamicMapper(DbaTabColsMapper.class, simDataSource2);
+        Mapper dbaTabColsMpr_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, DbaTabColsMapper.class, simDataSource1);
+        Mapper dbaTabColsMpr_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, DbaTabColsMapper.class, simDataSource2);
 
         //每次循环一个表名 匹配列
         List<String> dbaCols_CompareCols = PropertyUtils.getPropertyToList("dbcompare", "Dba_tab_cols.CompareCols");
@@ -217,8 +217,8 @@ public class DbCompareTest {
 
         //---------第三个Sheet页（索引对比）---------
         //获取数据源
-        Mapper userIdxMpr_db1 = CompareUtils.getDbDynamicMapper(UserIndexesMapper.class, simDataSource1);
-        Mapper userIdxMpr_db2 = CompareUtils.getDbDynamicMapper(UserIndexesMapper.class, simDataSource2);
+        Mapper userIdxMpr_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, UserIndexesMapper.class, simDataSource1);
+        Mapper userIdxMpr_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, UserIndexesMapper.class, simDataSource2);
 
         //获取库表的数据源
         Map<String, List> urIdxSourceMap = CompareUtils.getBsTgListAndCpCols(userIdxMpr_db1, userIdxMpr_db2, CompareUtils.User_indexes, null);
@@ -246,8 +246,8 @@ public class DbCompareTest {
         List<Map> baseIdxMatchList = urIdxResultMap.get("baseMapMatchList");
 
         //获取数据源
-        Mapper dbaIndColsMpr_db1 = CompareUtils.getDbDynamicMapper(DbaIndColumnsMapper.class, simDataSource1);
-        Mapper dbaIndColsMpr_db2 = CompareUtils.getDbDynamicMapper(DbaIndColumnsMapper.class, simDataSource2);
+        Mapper dbaIndColsMpr_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, DbaIndColumnsMapper.class, simDataSource1);
+        Mapper dbaIndColsMpr_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, DbaIndColumnsMapper.class, simDataSource2);
 
         //每次循环一个表名 匹配列
         List<String> dbaIndCol_CompareCols = PropertyUtils.getPropertyToList("dbcompare", "Dba_ind_columns.CompareCols");
@@ -286,8 +286,8 @@ public class DbCompareTest {
 
         //---------第五个Sheet页（约束对比）---------
         //获取数据源
-        Mapper userCostMpr_db1 = CompareUtils.getDbDynamicMapper(UserConstraintsMapper.class, simDataSource1);
-        Mapper userCostMpr_db2 = CompareUtils.getDbDynamicMapper(UserConstraintsMapper.class, simDataSource2);
+        Mapper userCostMpr_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, UserConstraintsMapper.class, simDataSource1);
+        Mapper userCostMpr_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, UserConstraintsMapper.class, simDataSource2);
 
         //获取库表的数据源
         Map<String, List> urCostSourceMap = CompareUtils.getBsTgListAndCpCols(userCostMpr_db1, userCostMpr_db2, CompareUtils.User_Constraints, null);
@@ -315,8 +315,8 @@ public class DbCompareTest {
         List<Map> baseUrCostMatchList = urCostResultMap.get("baseMapMatchList");
 
         //获取数据源
-        Mapper dbaConsColsMpr_db1 = CompareUtils.getDbDynamicMapper(DbaConsColumnsMapper.class, simDataSource1);
-        Mapper dbaConsColsMpr_db2 = CompareUtils.getDbDynamicMapper(DbaConsColumnsMapper.class, simDataSource2);
+        Mapper dbaConsColsMpr_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, DbaConsColumnsMapper.class, simDataSource1);
+        Mapper dbaConsColsMpr_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, DbaConsColumnsMapper.class, simDataSource2);
 
         //每次循环一个表名 匹配列
         List<String> dbaConsCol_CompareCols = PropertyUtils.getPropertyToList("dbcompare", "Dba_cons_columns.CompareCols");
@@ -355,8 +355,8 @@ public class DbCompareTest {
 
         //---------第七个Sheet页（函数、存储过程、触发器名字对比）---------
         //获取数据源
-        Mapper userProcMpr_db1 = CompareUtils.getDbDynamicMapper(UserProceduresMapper.class, simDataSource1);
-        Mapper userProcMpr_db2 = CompareUtils.getDbDynamicMapper(UserProceduresMapper.class, simDataSource2);
+        Mapper userProcMpr_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, UserProceduresMapper.class, simDataSource1);
+        Mapper userProcMpr_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, UserProceduresMapper.class, simDataSource2);
 
         //获取库表的数据源
         Map<String, List> urProcSourceMap = CompareUtils.getBsTgListAndCpCols(userProcMpr_db1, userProcMpr_db2, CompareUtils.User_Procedures, null);
@@ -384,8 +384,8 @@ public class DbCompareTest {
         List<Map> baseUrProcMatchList = urProcResultMap.get("baseMapMatchList");
 
         //获取数据源
-        Mapper dbaSourceMpr_db1 = CompareUtils.getDbDynamicMapper(DbaSourceMapper.class, simDataSource1);
-        Mapper dbaSourceMpr_db2 = CompareUtils.getDbDynamicMapper(DbaSourceMapper.class, simDataSource2);
+        Mapper dbaSourceMpr_db1 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d1, DbaSourceMapper.class, simDataSource1);
+        Mapper dbaSourceMpr_db2 = CompareUtils.getDbDynamicMapper(DataSourceEnum.d2, DbaSourceMapper.class, simDataSource2);
 
         //每次循环一个表名 匹配列
         List<String> dbaSource_CompareCols = PropertyUtils.getPropertyToList("dbcompare", "Dba_Source.CompareCols");
